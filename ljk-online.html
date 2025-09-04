@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ujian Digital - Penilaian Sumatif</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body { 
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .answer-btn {
+            touch-action: manipulation;
+        }
+        .selected {
+            background-color: #3b82f6;
+            color: white;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+        .correct {
+            background-color: #10b981;
+            color: white;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+        .incorrect {
+            background-color: #ef4444;
+            color: white;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+        .question-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px;
+            border-radius: 12px;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 8px;
+        }
+        .question-number {
+            min-width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .options-container {
+            display: flex;
+            gap: 6px;
+            flex: 1;
+        }
+        .complex-question {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        .floating-action {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 50;
+        }
+        .status-bar {
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.9);
+        }
+        .loading {
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .tab-button {
+            transition: all 0.3s ease;
+        }
+        .tab-button.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .pdf-container {
+            width: 100%;
+            height: 80vh;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #f9fafb;
+        }
+        .pdf-embed {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .instruction-card {
+            background: linear-gradient(135deg, #fef3c7 0%, #fcd34d 100%);
+            border: 2px solid #f59e0b;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 min-h-screen">
+    <!-- Status Bar -->
+    <div class="status-bar border-b border-gray-200">
+        <div class="px-4 py-3">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-2">
+                    <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                    <span class="text-sm font-medium text-gray-700">Ujian Digital - Penilaian Sumatif</span>
+                </div>
+                <div class="text-xs text-gray-500" id="progressText">0/35 Soal</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab Navigation -->
+    <div class="px-4 py-4">
+        <div class="bg-white rounded-2xl shadow-lg p-2 mb-4">
+            <div class="flex space-x-2">
+                <button onclick="switchTab('soal')" id="tabSoal" class="tab-button flex-1 py-3 px-4 rounded-xl font-semibold text-sm bg-gray-100 text-gray-600">
+                    📄 Lembar Soal
+                </button>
+                <button onclick="switchTab('jawaban')" id="tabJawaban" class="tab-button flex-1 py-3 px-4 rounded-xl font-semibold text-sm bg-gray-100 text-gray-600">
+                    ✏️ Lembar Jawaban
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab Content: Lembar Soal -->
+    <div id="contentSoal" class="tab-content px-4 pb-24">
+        <!-- Instructions Card -->
+        <div class="instruction-card rounded-2xl shadow-lg p-6 mb-6">
+            <div class="text-center mb-4">
+                <h2 class="text-xl font-bold text-amber-800 mb-2">📋 PETUNJUK PENGERJAAN</h2>
+                <div class="w-16 h-1 bg-amber-600 mx-auto rounded-full"></div>
+            </div>
+            
+            <div class="space-y-4 text-amber-800">
+                <div class="flex items-start space-x-3">
+                    <div class="w-8 h-8 bg-amber-600 text-white rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0">1</div>
+                    <div>
+                        <p class="font-semibold mb-1">Baca Soal dengan Teliti</p>
+                        <p class="text-sm">Scroll ke bawah untuk melihat semua soal dalam file PDF. Pastikan Anda membaca setiap soal dengan seksama.</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-start space-x-3">
+                    <div class="w-8 h-8 bg-amber-600 text-white rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0">2</div>
+                    <div>
+                        <p class="font-semibold mb-1">Tulis Jawaban di Buku Tulis</p>
+                        <p class="text-sm">Kerjakan soal di buku tulis Anda terlebih dahulu. Gunakan waktu untuk berpikir dan menghitung dengan teliti.</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-start space-x-3">
+                    <div class="w-8 h-8 bg-amber-600 text-white rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0">3</div>
+                    <div>
+                        <p class="font-semibold mb-1">Pindahkan ke Lembar Jawaban Digital</p>
+                        <p class="text-sm">Setelah selesai mengerjakan, klik tab "Lembar Jawaban" dan masukkan jawaban Anda ke dalam sistem digital.</p>
+                    </div>
+                </div>
+                
+                <div class="bg-amber-100 border border-amber-300 rounded-lg p-3 mt-4">
+                    <p class="text-sm font-medium text-amber-800">
+                        ⚠️ <strong>PENTING:</strong> Pastikan semua data diri sudah diisi lengkap sebelum mengirim jawaban!
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- PDF Viewer -->
+        <div class="bg-white rounded-2xl shadow-lg p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-semibold text-gray-800">📄 Soal Ujian</h3>
+                <a href="https://drive.google.com/file/d/1ME5YfWs7fVNZwzQZ5nAv8Z_ozfvu-GJt/view?usp=sharing" 
+                   target="_blank" 
+                   class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                    🔗 Buka di Tab Baru
+                </a>
+            </div>
+            
+            <div class="pdf-container">
+                <iframe 
+                    src="https://drive.google.com/file/d/1ME5YfWs7fVNZwzQZ5nAv8Z_ozfvu-GJt/preview" 
+                    class="pdf-embed"
+                    allow="autoplay">
+                </iframe>
+            </div>
+            
+            <div class="mt-4 text-center">
+                <p class="text-sm text-gray-600 mb-3">Jika PDF tidak tampil dengan baik, klik tombol "Buka di Tab Baru" di atas</p>
+                <button onclick="switchTab('jawaban')" class="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-xl font-semibold transition-colors">
+                    ➡️ Lanjut ke Lembar Jawaban
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab Content: Lembar Jawaban -->
+    <div id="contentJawaban" class="tab-content px-4 pb-24">
+        <!-- Header Card -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 mb-4">
+            <div class="text-center mb-4">
+                <h1 class="text-xl font-bold text-gray-800">📝 Lembar Jawaban Digital</h1>
+                <p class="text-sm text-gray-600">Penilaian Sumatif Tengah Semester</p>
+            </div>
+
+            <!-- Student Data -->
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs font-medium text-gray-600 mb-1">Nama Lengkap</label>
+                    <input type="text" id="studentName" class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Masukkan nama" required>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-600 mb-1">Kelas</label>
+                        <select id="studentClass" class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+                            <option value="">Pilih</option>
+                            <option value="4A">4A</option>
+                            <option value="4B">4B</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-600 mb-1">NIS</label>
+                        <input type="text" id="studentNIS" class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="NIS" required>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 1: Multiple Choice -->
+        <div class="mb-6">
+            <div class="flex items-center mb-3 px-2">
+                <div class="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center mr-2">
+                    <span class="text-white text-xs font-bold">1</span>
+                </div>
+                <h2 class="text-lg font-semibold text-gray-800">Pilihan Ganda</h2>
+                <span class="ml-2 text-sm text-gray-500">(30 soal)</span>
+            </div>
+            <div id="multipleChoice"></div>
+        </div>
+
+        <!-- Section 2: Complex Multiple Choice -->
+        <div class="mb-6">
+            <div class="flex items-center mb-3 px-2">
+                <div class="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center mr-2">
+                    <span class="text-white text-xs font-bold">2</span>
+                </div>
+                <h2 class="text-lg font-semibold text-gray-800">Pilihan Ganda Kompleks</h2>
+                <span class="ml-2 text-sm text-gray-500">(5 soal)</span>
+            </div>
+            <div class="bg-purple-50 rounded-lg p-3 mb-3">
+                <p class="text-xs text-purple-700">💡 Pilih tepat 2 jawaban yang benar untuk setiap soal</p>
+            </div>
+            <div id="complexChoice"></div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
+            <button onclick="submitAnswers()" id="submitBtn" class="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-4 px-6 rounded-xl font-semibold text-lg shadow-lg transition-all duration-200 transform hover:scale-105">
+                <span id="submitText">📤 Kirim Jawaban</span>
+                <div id="submitLoader" class="hidden flex items-center justify-center">
+                    <div class="loading w-5 h-5 border-2 border-white border-t-transparent rounded-full mr-2"></div>
+                    Mengirim...
+                </div>
+            </button>
+            <p class="text-xs text-gray-500 text-center mt-2">Pastikan semua data sudah benar sebelum mengirim</p>
+        </div>
+
+        <!-- Results Card -->
+        <div id="results" class="bg-white rounded-2xl shadow-lg p-6 hidden">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4 text-center">📊 Hasil Penilaian</h3>
+            <div class="grid grid-cols-2 gap-3 mb-4">
+                <div class="bg-gradient-to-br from-blue-400 to-blue-600 p-4 rounded-xl text-center text-white">
+                    <div class="text-xl font-bold" id="pgScore">0</div>
+                    <div class="text-xs opacity-90">Skor PG</div>
+                </div>
+                <div class="bg-gradient-to-br from-purple-400 to-purple-600 p-4 rounded-xl text-center text-white">
+                    <div class="text-xl font-bold" id="pgkScore">0</div>
+                    <div class="text-xs opacity-90">Skor PGK</div>
+                </div>
+            </div>
+            <div class="grid grid-cols-2 gap-3 mb-4">
+                <div class="bg-gradient-to-br from-green-400 to-green-600 p-4 rounded-xl text-center text-white">
+                    <div class="text-xl font-bold" id="totalScorePoints">0</div>
+                    <div class="text-xs opacity-90">Total Skor</div>
+                </div>
+                <div class="bg-gradient-to-br from-orange-400 to-orange-600 p-4 rounded-xl text-center text-white">
+                    <div class="text-2xl font-bold" id="finalGrade">0</div>
+                    <div class="text-xs opacity-90">Nilai</div>
+                </div>
+            </div>
+            <div class="bg-green-50 border border-green-200 rounded-lg p-3 mb-4">
+                <p class="text-sm text-green-700 text-center">✅ Jawaban berhasil disimpan!</p>
+            </div>
+            <button onclick="showDetailedResults()" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg text-sm font-medium">
+                📋 Lihat Detail Jawaban
+            </button>
+        </div>
+    </div>
+
+    <!-- Floating Action Button (only visible on Lembar Jawaban tab) -->
+    <div class="floating-action" id="floatingActions" style="display: none;">
+        <div class="flex flex-col space-y-2">
+            <button onclick="checkAnswers()" class="w-14 h-14 bg-blue-500 hover:bg-blue-600 text-white rounded-full shadow-lg flex items-center justify-center text-xl">
+                ✓
+            </button>
+            <button onclick="resetAnswers()" class="w-12 h-12 bg-gray-500 hover:bg-gray-600 text-white rounded-full shadow-lg flex items-center justify-center text-lg">
+                ↻
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Google Apps Script Web App URL - Connected to your Google Sheets
+        const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbx4lHCjV9KmILDBtBrXsDIz-WVEIL-WrXQRVAVST2WQzZ1Xn3tBgw2JFmyZd5QQ0NLD/exec';
+
+        // Answer keys
+        const multipleChoiceAnswers = [
+  'B','D','A','C','A','A','C','D','D','B',
+  'C','C','C','D','B','C','B','B','C','D',
+  'A','A','A','B','A','C','C','C','C','D'
+];
+
+        const complexChoiceAnswers = [
+            ['B','C'],
+            ['A','C'],
+            ['A','C'],
+            ['C','D'],
+            ['B','D']
+        ];
+
+        let answeredQuestions = 0;
+        let isSubmitted = false;
+        let currentTab = 'soal';
+
+        // Tab switching function
+        function switchTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active class from all tab buttons
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+                button.classList.add('bg-gray-100', 'text-gray-600');
+                button.classList.remove('text-white');
+            });
+            
+            // Show selected tab content
+            document.getElementById(`content${tabName.charAt(0).toUpperCase() + tabName.slice(1)}`).classList.add('active');
+            
+            // Activate selected tab button
+            const activeButton = document.getElementById(`tab${tabName.charAt(0).toUpperCase() + tabName.slice(1)}`);
+            activeButton.classList.add('active');
+            activeButton.classList.remove('bg-gray-100', 'text-gray-600');
+            
+            // Show/hide floating actions based on tab
+            const floatingActions = document.getElementById('floatingActions');
+            if (tabName === 'jawaban') {
+                floatingActions.style.display = 'block';
+            } else {
+                floatingActions.style.display = 'none';
+            }
+            
+            currentTab = tabName;
+        }
+
+        // Generate multiple choice questions
+        function generateMultipleChoice() {
+            const container = document.getElementById('multipleChoice');
+            for (let i = 1; i <= 30; i++) {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'question-row';
+                questionDiv.innerHTML = `
+                    <div class="question-number">${i}</div>
+                    <div class="options-container">
+                        ${['A', 'B', 'C', 'D'].map(option => `
+                            <button class="answer-btn flex-1 py-2 px-3 text-sm font-medium border border-gray-200 rounded-lg focus:outline-none" 
+                                    onclick="selectMultipleChoice(${i}, '${option}')" 
+                                    data-question="${i}" 
+                                    data-option="${option}">
+                                ${option}
+                            </button>
+                        `).join('')}
+                    </div>
+                `;
+                container.appendChild(questionDiv);
+            }
+        }
+
+        // Generate complex choice questions
+        function generateComplexChoice() {
+            const container = document.getElementById('complexChoice');
+            for (let i = 1; i <= 5; i++) {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'question-row';
+                questionDiv.innerHTML = `
+                    <div class="question-number complex-question">${i}</div>
+                    <div class="options-container">
+                        ${['A', 'B', 'C', 'D'].map(option => `
+                            <button class="answer-btn flex-1 py-2 px-3 text-sm font-medium border border-gray-200 rounded-lg focus:outline-none" 
+                                    onclick="selectComplexChoice(${i}, '${option}')" 
+                                    data-complex-question="${i}" 
+                                    data-option="${option}">
+                                ${option}
+                            </button>
+                        `).join('')}
+                    </div>
+                `;
+                container.appendChild(questionDiv);
+            }
+        }
+
+        // Select multiple choice answer
+        function selectMultipleChoice(questionNum, option) {
+            if (isSubmitted) return;
+            
+            const questionButtons = document.querySelectorAll(`[data-question="${questionNum}"]`);
+            const wasSelected = document.querySelector(`[data-question="${questionNum}"].selected`);
+            
+            questionButtons.forEach(btn => {
+                btn.classList.remove('selected');
+            });
+
+            const selectedButton = document.querySelector(`[data-question="${questionNum}"][data-option="${option}"]`);
+            selectedButton.classList.add('selected');
+            
+            if (!wasSelected) {
+                answeredQuestions++;
+                updateProgress();
+            }
+        }
+
+        // Select complex choice answer (exactly 2 answers)
+        function selectComplexChoice(questionNum, option) {
+            if (isSubmitted) return;
+            
+            const selectedButton = document.querySelector(`[data-complex-question="${questionNum}"][data-option="${option}"]`);
+            const allSelected = document.querySelectorAll(`[data-complex-question="${questionNum}"].selected`);
+            
+            if (selectedButton.classList.contains('selected')) {
+                selectedButton.classList.remove('selected');
+                answeredQuestions--;
+                updateProgress();
+            } else {
+                if (allSelected.length >= 2) {
+                    showAlert('Maksimal 2 jawaban per soal!', 'warning', 'Perhatian!');
+                    return;
+                }
+                selectedButton.classList.add('selected');
+                if (allSelected.length === 1) {
+                    answeredQuestions++;
+                    updateProgress();
+                }
+            }
+        }
+
+        // Update progress
+        function updateProgress() {
+            document.getElementById('progressText').textContent = `${answeredQuestions}/35 Soal`;
+        }
+
+        // Show detailed results in a table
+        function showDetailedResults() {
+            const answers = getStudentAnswers();
+            const result = calculateScore(answers);
+            
+            let tableRows = '';
+            result.detailedResults.forEach((item, index) => {
+                const rowClass = item.status === 'Benar' ? 'bg-green-50' : 
+                               item.status.includes('Parsial') ? 'bg-yellow-50' : 'bg-red-50';
+                const statusColor = item.status === 'Benar' ? 'text-green-700' : 
+                                  item.status.includes('Parsial') ? 'text-yellow-700' : 'text-red-700';
+                
+                tableRows += `
+                    <tr class="${rowClass}">
+                        <td class="border border-gray-300 px-3 py-2 text-center text-sm font-medium">${item.no}</td>
+                        <td class="border border-gray-300 px-3 py-2 text-center text-sm">${item.studentAnswer}</td>
+                        <td class="border border-gray-300 px-3 py-2 text-center text-sm font-medium ${statusColor}">${item.status}</td>
+                        <td class="border border-gray-300 px-3 py-2 text-center text-sm font-bold">${item.score}</td>
+                    </tr>
+                `;
+            });
+
+            Swal.fire({
+                title: '📋 Detail Hasil Jawaban',
+                html: `
+                    <div class="text-left">
+                        <!-- Summary Cards -->
+                        <div class="grid grid-cols-2 gap-2 mb-4">
+                            <div class="bg-blue-100 p-3 rounded-lg text-center">
+                                <div class="text-lg font-bold text-blue-800">${result.pgScore}/29</div>
+                                <div class="text-xs text-blue-600">Skor PG</div>
+                            </div>
+                            <div class="bg-purple-100 p-3 rounded-lg text-center">
+                                <div class="text-lg font-bold text-purple-800">${result.pgkScore}/10</div>
+                                <div class="text-xs text-purple-600">Skor PGK</div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 mb-4">
+                            <div class="bg-green-100 p-3 rounded-lg text-center">
+                                <div class="text-lg font-bold text-green-800">${result.totalScore}/39</div>
+                                <div class="text-xs text-green-600">Total Skor</div>
+                            </div>
+                            <div class="bg-orange-100 p-3 rounded-lg text-center">
+                                <div class="text-xl font-bold text-orange-800">${result.finalGrade}</div>
+                                <div class="text-xs text-orange-600">Nilai Akhir</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Detailed Table -->
+                        <div class="overflow-x-auto max-h-96 overflow-y-auto">
+                            <table class="w-full text-sm border-collapse border border-gray-300">
+                                <thead class="bg-gray-100 sticky top-0">
+                                    <tr>
+                                        <th class="border border-gray-300 px-3 py-2 text-center font-semibold">No.</th>
+                                        <th class="border border-gray-300 px-3 py-2 text-center font-semibold">Jawaban</th>
+                                        <th class="border border-gray-300 px-3 py-2 text-center font-semibold">Status</th>
+                                        <th class="border border-gray-300 px-3 py-2 text-center font-semibold">Skor</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${tableRows}
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="mt-4 text-center">
+                            <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                                <p class="text-sm text-blue-700">
+                                    <strong>Keterangan:</strong><br>
+                                    • PG: 1 poin per jawaban benar<br>
+                                    • PGK: 1 poin per jawaban benar (maksimal 2 poin per soal)<br>
+                                    • Parsial: Mendapat sebagian poin dari PGK
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                width: '90%',
+                maxWidth: '800px',
+                confirmButtonText: 'Tutup',
+                confirmButtonColor: '#3b82f6',
+                customClass: {
+                    popup: 'rounded-2xl',
+                    confirmButton: 'rounded-lg px-6 py-2'
+                }
+            });
+        }
+
+        // Show SweetAlert message
+        function showAlert(message, type = 'error', title = '') {
+            const config = {
+                text: message,
+                confirmButtonColor: '#3b82f6',
+                customClass: {
+                    popup: 'rounded-2xl',
+                    confirmButton: 'rounded-lg px-6 py-2'
+                }
+            };
+
+            if (type === 'success') {
+                config.icon = 'success';
+                config.title = title || 'Berhasil!';
+                config.confirmButtonColor = '#10b981';
+            } else if (type === 'warning') {
+                config.icon = 'warning';
+                config.title = title || 'Perhatian!';
+                config.confirmButtonColor = '#f59e0b';
+            } else if (type === 'info') {
+                config.icon = 'info';
+                config.title = title || 'Informasi';
+                config.confirmButtonColor = '#3b82f6';
+            } else {
+                config.icon = 'error';
+                config.title = title || 'Oops!';
+                config.confirmButtonColor = '#ef4444';
+            }
+
+            Swal.fire(config);
+        }
+
+        // Get student answers
+        function getStudentAnswers() {
+            const answers = {
+                multipleChoice: [],
+                complexChoice: []
+            };
+
+            // Get multiple choice answers - FIXED: Use button selector
+            for (let i = 1; i <= 30; i++) {
+                const selected = document.querySelector(`button[data-question="${i}"].selected`);
+                answers.multipleChoice.push(selected ? selected.getAttribute('data-option') : '');
+            }
+
+            // Get complex choice answers - FIXED: Use button selector
+            for (let i = 1; i <= 5; i++) {
+                const selected = document.querySelectorAll(`button[data-complex-question="${i}"].selected`);
+                const selectedOptions = Array.from(selected).map(btn => btn.getAttribute('data-option')).sort();
+                answers.complexChoice.push(selectedOptions);
+            }
+
+            return answers;
+        }
+
+        // Calculate score: correct answers / total answer keys × 100
+        // PGK allows partial scoring: 1 point per correct answer
+        function calculateScore(answers) {
+            let pgScore = 0;
+            let pgkScore = 0;
+            let correctQuestions = 0;
+            let totalQuestions = 34; // 29 PG (skip #25) + 5 PGK
+            let detailedResults = [];
+
+            // Multiple choice scoring (1 point per correct answer)
+            for (let i = 0; i < 30; i++) {
+                if (multipleChoiceAnswers[i] === '') {
+                    // Skip question 25 - don't add to detailed results
+                    continue;
+                }
+                
+                const isCorrect = answers.multipleChoice[i] === multipleChoiceAnswers[i];
+                const score = isCorrect ? 1 : 0;
+                
+                if (isCorrect) {
+                    pgScore += 1;
+                    correctQuestions++;
+                }
+                
+                detailedResults.push({
+                    no: i + 1,
+                    type: 'PG',
+                    studentAnswer: answers.multipleChoice[i] || '-',
+                    correctAnswer: multipleChoiceAnswers[i],
+                    status: isCorrect ? 'Benar' : 'Salah',
+                    score: score
+                });
+            }
+
+            // Complex choice scoring with partial credit (1 point per correct answer)
+            for (let i = 0; i < 5; i++) {
+                const correctAnswerSet = complexChoiceAnswers[i];
+                const studentAnswers = answers.complexChoice[i];
+                let partialScore = 0;
+                let correctCount = 0;
+                let wrongCount = 0;
+                
+                // Count how many student answers match the correct answers
+                studentAnswers.forEach(studentAnswer => {
+                    if (correctAnswerSet.includes(studentAnswer)) {
+                        partialScore += 1;
+                        correctCount++;
+                    } else {
+                        wrongCount++;
+                    }
+                });
+                
+                pgkScore += partialScore;
+                
+                // Count as correct question only if all answers are correct
+                const isFullyCorrect = correctAnswerSet.length === studentAnswers.length && 
+                                     correctAnswerSet.every(answer => studentAnswers.includes(answer));
+                
+                if (isFullyCorrect) {
+                    correctQuestions++;
+                }
+                
+                let status = 'Salah';
+                if (isFullyCorrect) {
+                    status = 'Benar';
+                } else if (partialScore > 0) {
+                    status = `Parsial (${partialScore}/2)`;
+                }
+                
+                detailedResults.push({
+                    no: `PGK ${i + 1}`,
+                    type: 'PGK',
+                    studentAnswer: studentAnswers.length > 0 ? studentAnswers.join(', ') : '-',
+                    correctAnswer: correctAnswerSet.join(', '),
+                    status: status,
+                    score: partialScore
+                });
+            }
+
+            const totalScore = pgScore + pgkScore;
+            const totalAnswerKeys = 39; // 29 (PG) + 10 (PGK)
+            const finalGrade = Math.round((totalScore / totalAnswerKeys) * 100);
+
+            return {
+                correct: correctQuestions,
+                incorrect: totalQuestions - correctQuestions,
+                pgScore: pgScore,
+                pgkScore: pgkScore,
+                totalScore: totalScore,
+                finalGrade: finalGrade,
+                totalAnswerKeys: totalAnswerKeys,
+                detailedResults: detailedResults
+            };
+        }
+
+        // Validate all answers before submission
+        function validateAnswers() {
+            const validation = {
+                isValid: true,
+                missing: [],
+                studentData: {},
+                stats: {
+                    multipleChoice: 0,
+                    complexChoice: 0,
+                    total: 0
+                }
+            };
+
+            // Validate student data
+            const name = document.getElementById('studentName').value.trim();
+            const studentClass = document.getElementById('studentClass').value;
+            const nis = document.getElementById('studentNIS').value.trim();
+
+            validation.studentData = { name, studentClass, nis };
+
+            if (!name) validation.missing.push('Nama Lengkap');
+            if (!studentClass) validation.missing.push('Kelas');
+            if (!nis) validation.missing.push('NIS');
+
+            // Check multiple choice answers - FIXED: Check for any selected button in each question
+            const missingMC = [];
+            for (let i = 1; i <= 30; i++) {
+                const selected = document.querySelector(`button[data-question="${i}"].selected`);
+                if (selected) {
+                    validation.stats.multipleChoice++;
+                } else {
+                    if (i !== 25) { // Skip question 25 as it's empty in answer key
+                        missingMC.push(i);
+                    }
+                }
+            }
+
+            // Check complex choice answers - FIXED: Check for selected buttons in each complex question
+            const missingComplex = [];
+            for (let i = 1; i <= 5; i++) {
+                const selected = document.querySelectorAll(`button[data-complex-question="${i}"].selected`);
+                if (selected.length === 2) {
+                    validation.stats.complexChoice++;
+                } else if (selected.length === 0) {
+                    missingComplex.push(i);
+                } else {
+                    missingComplex.push(`${i} (hanya ${selected.length} jawaban, butuh 2)`);
+                }
+            }
+
+            validation.stats.total = validation.stats.multipleChoice + validation.stats.complexChoice;
+
+            // Add missing answers to validation
+            if (missingMC.length > 0) {
+                validation.missing.push(`Pilihan Ganda: Soal ${missingMC.join(', ')}`);
+                validation.isValid = false;
+            }
+            if (missingComplex.length > 0) {
+                validation.missing.push(`Pilihan Ganda Kompleks: Soal ${missingComplex.join(', ')}`);
+                validation.isValid = false;
+            }
+
+            // Check if student data is complete
+            if (!name || !studentClass || !nis) {
+                validation.isValid = false;
+            }
+
+            return validation;
+        }
+
+        // Submit answers to Google Sheets
+        async function submitAnswers() {
+            // Comprehensive validation
+            const validation = validateAnswers();
+
+            // Show validation results
+            if (!validation.isValid) {
+                let message = 'Mohon lengkapi data berikut:\n\n';
+                
+                if (validation.missing.length > 0) {
+                    message += validation.missing.map(item => `• ${item}`).join('\n');
+                }
+
+                showAlert(message, 'warning', 'Data Belum Lengkap');
+                return;
+            }
+
+            // Show confirmation with statistics
+            const confirmResult = await Swal.fire({
+                title: 'Konfirmasi Pengiriman',
+                html: `
+                    <div class="text-left">
+                        <p class="mb-3"><strong>Data Siswa:</strong></p>
+                        <p class="text-sm mb-1">• Nama: ${validation.studentData.name}</p>
+                        <p class="text-sm mb-1">• Kelas: ${validation.studentData.studentClass}</p>
+                        <p class="text-sm mb-3">• NIS: ${validation.studentData.nis}</p>
+                        
+                        <p class="mb-3"><strong>Jawaban Terisi:</strong></p>
+                        <p class="text-sm mb-1">• Pilihan Ganda: ${validation.stats.multipleChoice}/29 soal</p>
+                        <p class="text-sm mb-1">• Pilihan Ganda Kompleks: ${validation.stats.complexChoice}/5 soal</p>
+                        <p class="text-sm mb-3">• Total: ${validation.stats.total}/34 soal</p>
+                        
+                        <p class="text-red-600 text-sm">⚠️ Setelah dikirim, jawaban tidak dapat diubah!</p>
+                    </div>
+                `,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: '📤 Ya, Kirim Jawaban',
+                cancelButtonText: '❌ Batal',
+                confirmButtonColor: '#10b981',
+                cancelButtonColor: '#ef4444',
+                customClass: {
+                    popup: 'rounded-2xl',
+                    confirmButton: 'rounded-lg px-6 py-2',
+                    cancelButton: 'rounded-lg px-6 py-2'
+                }
+            });
+
+            if (!confirmResult.isConfirmed) {
+                return;
+            }
+
+            // Get answers and calculate score
+            const answers = getStudentAnswers();
+            const result = calculateScore(answers);
+
+            // Show loading
+            const submitBtn = document.getElementById('submitBtn');
+            const submitText = document.getElementById('submitText');
+            const submitLoader = document.getElementById('submitLoader');
+            
+            submitBtn.disabled = true;
+            submitText.classList.add('hidden');
+            submitLoader.classList.remove('hidden');
+
+            // Check if Google Apps Script URL is configured
+            if (WEBAPP_URL.includes('YOUR_SCRIPT_ID')) {
+                // Simulate successful submission for demo purposes
+                setTimeout(async () => {
+                    // Show results
+                    document.getElementById('pgScore').textContent = result.pgScore;
+                    document.getElementById('pgkScore').textContent = result.pgkScore;
+                    document.getElementById('totalScorePoints').textContent = result.totalScore;
+                    document.getElementById('finalGrade').textContent = result.finalGrade;
+                    document.getElementById('results').classList.remove('hidden');
+                    
+                    // Mark as submitted
+                    isSubmitted = true;
+                    submitBtn.innerHTML = '✅ Jawaban Terkirim (Demo)';
+                    submitBtn.classList.remove('from-green-500', 'to-green-600', 'hover:from-green-600', 'hover:to-green-700');
+                    submitBtn.classList.add('bg-gray-400', 'cursor-not-allowed');
+                    
+                    // Show demo success message
+                    await Swal.fire({
+                        title: 'Demo Mode - Jawaban Tersimpan!',
+                        html: `
+                            <div class="text-center">
+                                <div class="text-4xl mb-4">🎉</div>
+                                <p class="mb-3">Ini adalah mode demo. Jawaban tidak tersimpan ke Google Sheets.</p>
+                                <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-3">
+                                    <p class="text-lg font-bold text-green-800">Nilai Anda: ${result.finalGrade}</p>
+                                    <p class="text-sm text-green-600">Total Skor: ${result.totalScore}/${result.totalAnswerKeys}</p>
+                                    <p class="text-xs text-green-500">PG: ${result.pgScore}/29 | PGK: ${result.pgkScore}/10</p>
+                                </div>
+                                <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 mt-3">
+                                    <p class="text-xs text-blue-700">💡 Untuk menyimpan ke Google Sheets, ganti WEBAPP_URL dengan URL Apps Script Anda</p>
+                                </div>
+                            </div>
+                        `,
+                        icon: 'success',
+                        confirmButtonText: 'Lihat Detail Hasil',
+                        confirmButtonColor: '#10b981',
+                        customClass: {
+                            popup: 'rounded-2xl',
+                            confirmButton: 'rounded-lg px-6 py-2'
+                        }
+                    });
+                    
+                    // Scroll to results
+                    document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+                }, 2000);
+                return;
+            }
+
+            // Prepare data for submission
+            const submissionData = {
+                timestamp: new Date().toLocaleString('id-ID'),
+                name: validation.studentData.name,
+                class: validation.studentData.studentClass,
+                nis: validation.studentData.nis,
+                multipleChoiceAnswers: answers.multipleChoice.join(','),
+                complexChoiceAnswers: answers.complexChoice.map(arr => arr.join(';')).join(','),
+                pgScore: result.pgScore,
+                pgkScore: result.pgkScore,
+                totalScore: result.totalScore,
+                finalGrade: result.finalGrade
+            };
+
+            try {
+                // Create form data for Google Apps Script
+                const formData = new FormData();
+                Object.keys(submissionData).forEach(key => {
+                    formData.append(key, submissionData[key]);
+                });
+
+                // Try multiple submission methods
+                let response;
+                let success = false;
+
+                // Method 1: POST with JSON
+                try {
+                    response = await fetch(WEBAPP_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(submissionData)
+                    });
+                    success = true;
+                } catch (error) {
+                    console.log('Method 1 failed, trying method 2...');
+                }
+
+                // Method 2: POST with FormData
+                if (!success) {
+                    try {
+                        response = await fetch(WEBAPP_URL, {
+                            method: 'POST',
+                            mode: 'no-cors',
+                            body: formData
+                        });
+                        success = true;
+                    } catch (error) {
+                        console.log('Method 2 failed, trying method 3...');
+                    }
+                }
+
+                // Method 3: GET with URL parameters
+                if (!success) {
+                    try {
+                        const params = new URLSearchParams(submissionData);
+                        response = await fetch(`${WEBAPP_URL}?${params.toString()}`, {
+                            method: 'GET',
+                            mode: 'no-cors'
+                        });
+                        success = true;
+                    } catch (error) {
+                        console.log('All methods failed');
+                    }
+                }
+
+                if (success) {
+                    // Mark as submitted first
+                    isSubmitted = true;
+                    submitBtn.innerHTML = '✅ Jawaban Terkirim';
+                    submitBtn.classList.remove('from-green-500', 'to-green-600', 'hover:from-green-600', 'hover:to-green-700');
+                    submitBtn.classList.add('bg-gray-400', 'cursor-not-allowed');
+                    
+                    // Show success message with score IMMEDIATELY
+                    await Swal.fire({
+                        title: 'Jawaban Berhasil Dikirim!',
+                        html: `
+                            <div class="text-center">
+                                <div class="text-4xl mb-4">🎉</div>
+                                <p class="mb-3">Jawaban Anda telah tersimpan dengan aman</p>
+                                <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-3">
+                                    <p class="text-lg font-bold text-green-800">Nilai Anda: ${result.finalGrade}</p>
+                                    <p class="text-sm text-green-600">Total Skor: ${result.totalScore}/${result.totalAnswerKeys}</p>
+                                    <p class="text-xs text-green-500 mt-1">PG: ${result.pgScore}/29 | PGK: ${result.pgkScore}/10</p>
+                                </div>
+                                <p class="text-sm text-gray-600">Terima kasih telah mengerjakan ujian!</p>
+                            </div>
+                        `,
+                        icon: 'success',
+                        confirmButtonText: 'Tutup',
+                        confirmButtonColor: '#10b981',
+                        customClass: {
+                            popup: 'rounded-2xl',
+                            confirmButton: 'rounded-lg px-6 py-2'
+                        }
+                    });
+                    
+                    // Show results card after SweetAlert is closed
+                    document.getElementById('pgScore').textContent = result.pgScore;
+                    document.getElementById('pgkScore').textContent = result.pgkScore;
+                    document.getElementById('totalScorePoints').textContent = result.totalScore;
+                    document.getElementById('finalGrade').textContent = result.finalGrade;
+                    document.getElementById('results').classList.remove('hidden');
+                    document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    throw new Error('Semua metode pengiriman gagal');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                
+                // Show detailed error message with troubleshooting
+                await Swal.fire({
+                    title: 'Gagal Mengirim Jawaban',
+                    html: `
+                        <div class="text-center">
+                            <div class="text-4xl mb-4">😞</div>
+                            <p class="mb-3">Terjadi kesalahan saat mengirim jawaban</p>
+                            <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-3">
+                                <p class="text-sm text-red-600 mb-2"><strong>Kemungkinan penyebab:</strong></p>
+                                <p class="text-xs text-red-600 mb-1">• URL Google Apps Script belum dikonfigurasi</p>
+                                <p class="text-xs text-red-600 mb-1">• Koneksi internet bermasalah</p>
+                                <p class="text-xs text-red-600 mb-1">• Apps Script belum di-deploy sebagai Web App</p>
+                                <p class="text-xs text-red-600">• Permission Google Sheets belum diatur</p>
+                            </div>
+                            <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                                <p class="text-xs text-blue-700">💡 Untuk sementara, Anda bisa menggunakan tombol "✓" untuk melihat hasil jawaban</p>
+                            </div>
+                        </div>
+                    `,
+                    icon: 'error',
+                    showCancelButton: true,
+                    confirmButtonText: 'Coba Lagi',
+                    cancelButtonText: 'Lihat Hasil Saja',
+                    confirmButtonColor: '#ef4444',
+                    cancelButtonColor: '#6b7280',
+                    customClass: {
+                        popup: 'rounded-2xl',
+                        confirmButton: 'rounded-lg px-6 py-2',
+                        cancelButton: 'rounded-lg px-6 py-2'
+                    }
+                }).then((result) => {
+                    if (result.dismiss === Swal.DismissReason.cancel) {
+                        // Show results without saving
+                        const fallbackResult = calculateScore(getStudentAnswers());
+                        document.getElementById('pgScore').textContent = fallbackResult.pgScore;
+                        document.getElementById('pgkScore').textContent = fallbackResult.pgkScore;
+                        document.getElementById('totalScorePoints').textContent = fallbackResult.totalScore;
+                        document.getElementById('finalGrade').textContent = fallbackResult.finalGrade;
+                        document.getElementById('results').classList.remove('hidden');
+                        document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+                    }
+                });
+                
+                // Reset button
+                submitBtn.disabled = false;
+                submitText.classList.remove('hidden');
+                submitLoader.classList.add('hidden');
+            }
+        }
+
+        // Check answers (for preview)
+        function checkAnswers() {
+            if (isSubmitted) return;
+            
+            let correctCount = 0;
+
+            // Check multiple choice - FIXED: Use button selector
+            for (let i = 1; i <= 30; i++) {
+                const selectedButton = document.querySelector(`button[data-question="${i}"].selected`);
+                const correctAnswer = multipleChoiceAnswers[i-1];
+                
+                if (correctAnswer === '') continue;
+                
+                if (selectedButton) {
+                    const selectedOption = selectedButton.getAttribute('data-option');
+                    if (selectedOption === correctAnswer) {
+                        selectedButton.classList.remove('selected');
+                        selectedButton.classList.add('correct');
+                        correctCount++;
+                    } else {
+                        selectedButton.classList.remove('selected');
+                        selectedButton.classList.add('incorrect');
+                        
+                        const correctButton = document.querySelector(`button[data-question="${i}"][data-option="${correctAnswer}"]`);
+                        if (correctButton && !correctButton.classList.contains('incorrect')) {
+                            correctButton.classList.add('correct');
+                        }
+                    }
+                } else {
+                    const correctButton = document.querySelector(`button[data-question="${i}"][data-option="${correctAnswer}"]`);
+                    if (correctButton) {
+                        correctButton.classList.add('correct');
+                    }
+                }
+            }
+
+            // Check complex choice - FIXED: Use button selector
+            for (let i = 1; i <= 5; i++) {
+                const selectedButtons = document.querySelectorAll(`button[data-complex-question="${i}"].selected`);
+                const correctAnswers = complexChoiceAnswers[i-1];
+                const selectedOptions = Array.from(selectedButtons).map(btn => btn.getAttribute('data-option'));
+                
+                const isCorrect = correctAnswers.length === selectedOptions.length && 
+                                correctAnswers.every(answer => selectedOptions.includes(answer));
+                
+                if (isCorrect && selectedButtons.length === 2) {
+                    selectedButtons.forEach(btn => {
+                        btn.classList.remove('selected');
+                        btn.classList.add('correct');
+                    });
+                    correctCount++;
+                } else {
+                    selectedButtons.forEach(btn => {
+                        btn.classList.remove('selected');
+                        if (!correctAnswers.includes(btn.getAttribute('data-option'))) {
+                            btn.classList.add('incorrect');
+                        } else {
+                            btn.classList.add('correct');
+                        }
+                    });
+                    
+                    correctAnswers.forEach(answer => {
+                        const correctButton = document.querySelector(`button[data-complex-question="${i}"][data-option="${answer}"]`);
+                        if (correctButton && !correctButton.classList.contains('incorrect')) {
+                            correctButton.classList.add('correct');
+                        }
+                    });
+                }
+            }
+
+            // Calculate score using the same method as submission
+            const answers = getStudentAnswers();
+            const result = calculateScore(answers);
+
+            document.getElementById('pgScore').textContent = result.pgScore;
+            document.getElementById('pgkScore').textContent = result.pgkScore;
+            document.getElementById('totalScorePoints').textContent = result.totalScore;
+            document.getElementById('finalGrade').textContent = result.finalGrade;
+            document.getElementById('results').classList.remove('hidden');
+
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Reset answers
+        function resetAnswers() {
+            if (isSubmitted) {
+                if (!confirm('Jawaban sudah terkirim. Yakin ingin reset?')) {
+                    return;
+                }
+            }
+            
+            const allButtons = document.querySelectorAll('.answer-btn');
+            allButtons.forEach(btn => {
+                btn.classList.remove('selected', 'correct', 'incorrect');
+            });
+
+            answeredQuestions = 0;
+            isSubmitted = false;
+            updateProgress();
+
+            document.getElementById('results').classList.add('hidden');
+            document.getElementById('studentName').value = '';
+            document.getElementById('studentClass').value = '';
+            document.getElementById('studentNIS').value = '';
+
+            // Reset submit button
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '📤 Kirim Jawaban';
+            submitBtn.classList.remove('bg-gray-400', 'cursor-not-allowed');
+            submitBtn.classList.add('bg-gradient-to-r', 'from-green-500', 'to-green-600', 'hover:from-green-600', 'hover:to-green-700');
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            generateMultipleChoice();
+            generateComplexChoice();
+            updateProgress();
+            
+            // Start with Lembar Soal tab active
+            switchTab('soal');
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'978a5215c628fdea',t:'MTc1Njc4NzkzNi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
