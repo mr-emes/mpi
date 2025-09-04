@@ -245,6 +245,91 @@
             border-color: #3b82f6 !important;
             color: #3b82f6 !important;
         }
+
+        /* Admin Popup Modal */
+        .admin-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .admin-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .admin-modal-content {
+            background: linear-gradient(135deg, rgba(0,0,0,0.95), rgba(30,30,30,0.95));
+            border: 2px solid #f59e0b;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: scale(0.8);
+            transition: transform 0.3s ease;
+        }
+
+        .admin-modal.active .admin-modal-content {
+            transform: scale(1);
+        }
+
+        .admin-tab {
+            transition: all 0.3s ease;
+        }
+
+        .admin-tab.active {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+        }
+
+        .admin-tab:not(.active) {
+            color: #9ca3af;
+        }
+
+        .admin-tab:not(.active):hover {
+            color: white;
+            background: rgba(75, 85, 99, 0.5);
+        }
+
+        .input-mode-btn {
+            transition: all 0.3s ease;
+        }
+
+        .input-mode-btn.active {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+        }
+
+        .input-mode-btn:not(.active) {
+            color: #9ca3af;
+        }
+
+        .input-mode-btn:not(.active):hover {
+            color: white;
+            background: rgba(75, 85, 99, 0.5);
+        }
+
+        .name-item {
+            transition: all 0.3s ease;
+        }
+
+        .name-item:hover {
+            transform: translateX(5px);
+        }
     </style>
 </head>
 <body class="poppins bg-cream-50">
@@ -717,33 +802,7 @@
                 Terima kasih atas doa dan kehadiran Anda di hari bahagia kami
             </p>
             
-            <!-- Admin Controls (Hidden by default) -->
-            <div id="admin-controls" class="hidden mb-8">
-                <div class="glass-effect rounded-2xl p-6 border border-gray-600">
-                    <h3 class="text-xl font-bold text-white mb-4 text-center">
-                        <i class="fas fa-user-shield mr-2 text-gray-300"></i>Panel Admin
-                    </h3>
-                    
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-gray-200 font-semibold mb-2">Nama Tamu:</label>
-                            <input type="text" id="guest-name-input" placeholder="Masukkan nama tamu undangan..."
-                                   class="w-full px-4 py-3 border-2 border-gray-600 rounded-xl focus:border-gray-400 focus:outline-none transition-colors bg-gray-700 text-white placeholder-gray-400">
-                        </div>
-                        
-                        <button onclick="sharePersonalInvitation()" 
-                                class="w-full bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300 card-shadow">
-                            <i class="fab fa-whatsapp mr-2"></i>Bagikan Undangan Personal
-                        </button>
-                        
-                        <div class="text-center">
-                            <button onclick="toggleAdminMode()" class="text-sm text-gray-300 hover:text-gray-100">
-                                Sembunyikan Panel Admin
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+
             
         </div>
     </footer>
@@ -778,6 +837,153 @@
         </div>
     </nav>
 
+    <!-- Admin Popup Modal -->
+    <div id="admin-modal" class="admin-modal">
+        <div class="admin-modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-white playfair">
+                    <i class="fas fa-user-shield mr-2 text-gold-400"></i>Panel Admin
+                </h3>
+                <button onclick="closeAdminModal()" class="text-gray-400 hover:text-white text-2xl transition-colors">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <!-- Tab Navigation -->
+            <div class="flex mb-6 bg-gray-800 rounded-xl p-1">
+                <button onclick="switchAdminTab('share')" id="tab-share" 
+                        class="admin-tab flex-1 py-3 px-4 rounded-lg text-center font-semibold active">
+                    <i class="fab fa-whatsapp mr-2"></i>Bagikan Undangan
+                </button>
+                <button onclick="switchAdminTab('template')" id="tab-template" 
+                        class="admin-tab flex-1 py-3 px-4 rounded-lg text-center font-semibold">
+                    <i class="fas fa-edit mr-2"></i>Edit Template
+                </button>
+            </div>
+            
+            <!-- Share Tab -->
+            <div id="admin-share-tab" class="admin-tab-content">
+                <div class="space-y-4">
+                    <!-- Input Mode Toggle -->
+                    <div class="flex bg-gray-800 rounded-xl p-1 mb-4">
+                        <button onclick="switchInputMode('single')" id="mode-single" 
+                                class="input-mode-btn flex-1 py-2 px-4 rounded-lg text-center font-semibold active">
+                            <i class="fas fa-user mr-2"></i>Satu Nama
+                        </button>
+                        <button onclick="switchInputMode('multi')" id="mode-multi" 
+                                class="input-mode-btn flex-1 py-2 px-4 rounded-lg text-center font-semibold">
+                            <i class="fas fa-users mr-2"></i>Multi Nama
+                        </button>
+                    </div>
+                    
+                    <!-- Single Name Input -->
+                    <div id="single-input-section">
+                        <div>
+                            <label class="block text-gray-200 font-semibold mb-2">
+                                <i class="fas fa-user mr-2 text-gray-300"></i>Nama Tamu:
+                            </label>
+                            <input type="text" id="guest-name-input" placeholder="Masukkan nama tamu undangan..."
+                                   class="w-full px-4 py-3 border-2 border-gray-600 rounded-xl focus:border-gold-400 focus:outline-none transition-colors bg-gray-700 text-white placeholder-gray-400">
+                        </div>
+                        
+                        <button onclick="sharePersonalInvitation()" 
+                                class="w-full bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300 card-shadow mt-4">
+                            <i class="fab fa-whatsapp mr-2"></i>Bagikan Undangan Personal
+                        </button>
+                        
+                        <div class="bg-gray-800 rounded-xl p-4 border border-gray-600 mt-4">
+                            <h4 class="text-white font-semibold mb-2">
+                                <i class="fas fa-eye mr-2 text-gray-300"></i>Preview Pesan:
+                            </h4>
+                            <div id="message-preview" class="text-gray-300 text-sm whitespace-pre-line bg-gray-900 p-3 rounded-lg border border-gray-700">
+                                <!-- Preview will be generated here -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Multi Name Input -->
+                    <div id="multi-input-section" class="hidden">
+                        <div>
+                            <label class="block text-gray-200 font-semibold mb-2">
+                                <i class="fas fa-users mr-2 text-gray-300"></i>Daftar Nama Tamu:
+                            </label>
+                            <textarea id="multi-guest-names" rows="6" 
+                                      placeholder="Masukkan nama tamu, satu nama per baris:&#10;&#10;John Doe&#10;Jane Smith&#10;Ahmad Rahman&#10;Siti Nurhaliza"
+                                      class="w-full px-4 py-3 border-2 border-gray-600 rounded-xl focus:border-gold-400 focus:outline-none transition-colors resize-none bg-gray-700 text-white placeholder-gray-400"></textarea>
+                            <div class="text-xs text-gray-400 mt-2">
+                                <i class="fas fa-info-circle mr-1"></i>Tulis satu nama per baris. Nama kosong akan diabaikan.
+                            </div>
+                        </div>
+                        
+                        <button onclick="processMultiNames()" 
+                                class="w-full bg-blue-500 hover:bg-blue-600 text-white px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300 card-shadow mt-4">
+                            <i class="fas fa-list mr-2"></i>Proses Daftar Nama
+                        </button>
+                        
+                        <!-- Multi Names List -->
+                        <div id="multi-names-list" class="mt-4 hidden">
+                            <div class="bg-gray-800 rounded-xl p-4 border border-gray-600">
+                                <div class="flex justify-between items-center mb-4">
+                                    <h4 class="text-white font-semibold">
+                                        <i class="fas fa-list-check mr-2 text-green-400"></i>Daftar Undangan (<span id="names-count">0</span> nama)
+                                    </h4>
+                                    <button onclick="shareAllInvitations()" 
+                                            class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-semibold text-sm transition-all duration-300">
+                                        <i class="fab fa-whatsapp mr-1"></i>Share Semua
+                                    </button>
+                                </div>
+                                <div id="names-container" class="space-y-2 max-h-64 overflow-y-auto">
+                                    <!-- Names will be listed here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Template Tab -->
+            <div id="admin-template-tab" class="admin-tab-content hidden">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-gray-200 font-semibold mb-2">
+                            <i class="fas fa-comment-alt mr-2 text-gray-300"></i>Template Pesan WhatsApp:
+                        </label>
+                        <textarea id="message-template" rows="8" 
+                                  class="w-full px-4 py-3 border-2 border-gray-600 rounded-xl focus:border-gold-400 focus:outline-none transition-colors resize-none bg-gray-700 text-white placeholder-gray-400 font-mono text-sm"
+                                  placeholder="Tulis template pesan di sini..."></textarea>
+                        <div class="text-xs text-gray-400 mt-2">
+                            <strong>Tips:</strong> Gunakan <code>{nama}</code> untuk nama tamu dan <code>{link}</code> untuk link undangan
+                        </div>
+                    </div>
+                    
+                    <div class="flex space-x-3">
+                        <button onclick="saveTemplate()" 
+                                class="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-full font-semibold transition-all duration-300 card-shadow">
+                            <i class="fas fa-save mr-2"></i>Simpan Template
+                        </button>
+                        <button onclick="resetTemplate()" 
+                                class="flex-1 bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-full font-semibold transition-all duration-300 card-shadow">
+                            <i class="fas fa-undo mr-2"></i>Reset Default
+                        </button>
+                    </div>
+                    
+                    <div class="bg-gray-800 rounded-xl p-4 border border-gray-600">
+                        <h4 class="text-white font-semibold mb-2">
+                            <i class="fas fa-lightbulb mr-2 text-yellow-400"></i>Contoh Template:
+                        </h4>
+                        <div class="text-gray-300 text-sm bg-gray-900 p-3 rounded-lg border border-gray-700">
+                            <div class="mb-2"><strong>Variabel yang bisa digunakan:</strong></div>
+                            <div>• <code>{nama}</code> - Nama tamu</div>
+                            <div>• <code>{link}</code> - Link undangan personal</div>
+                            <div>• <code>{mempelai}</code> - Nama mempelai</div>
+                            <div>• <code>{tanggal}</code> - Tanggal pernikahan</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Wedding date
         const weddingDate = new Date('2025-10-18T08:00:00').getTime();
@@ -785,6 +991,288 @@
         // Global variables
         let isAdmin = false;
         let currentGuest = null;
+        
+        // Default message template
+        let messageTemplate = `🌸 *Undangan Pernikahan* 🌸
+
+*{mempelai}*
+{tanggal}
+
+Kepada Yth. *{nama}*
+
+Dengan penuh sukacita, kami mengundang Anda untuk berbagi kebahagiaan di hari istimewa kami.
+
+Klik link berikut untuk melihat undangan:
+{link}
+
+Terima kasih 🙏`;
+
+        // Load saved template from localStorage
+        function loadTemplate() {
+            const saved = localStorage.getItem('wedding-message-template');
+            if (saved) {
+                messageTemplate = saved;
+            }
+            document.getElementById('message-template').value = messageTemplate;
+            updatePreview();
+        }
+
+        // Save template to localStorage
+        function saveTemplate() {
+            const newTemplate = document.getElementById('message-template').value.trim();
+            
+            if (!newTemplate) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Template Kosong',
+                    text: 'Mohon isi template pesan terlebih dahulu',
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
+            
+            messageTemplate = newTemplate;
+            localStorage.setItem('wedding-message-template', messageTemplate);
+            updatePreview();
+            
+            Swal.fire({
+                icon: 'success',
+                title: 'Template Disimpan!',
+                text: 'Template pesan berhasil disimpan',
+                timer: 2000,
+                showConfirmButton: false
+            });
+        }
+
+        // Reset to default template
+        function resetTemplate() {
+            Swal.fire({
+                title: 'Reset Template?',
+                text: 'Apakah Anda yakin ingin mengembalikan template ke default?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Reset',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    messageTemplate = `🌸 *Undangan Pernikahan* 🌸
+
+*{mempelai}*
+{tanggal}
+
+Kepada Yth. *{nama}*
+
+Dengan penuh sukacita, kami mengundang Anda untuk berbagi kebahagiaan di hari istimewa kami.
+
+Klik link berikut untuk melihat undangan:
+{link}
+
+Terima kasih 🙏`;
+                    
+                    document.getElementById('message-template').value = messageTemplate;
+                    localStorage.removeItem('wedding-message-template');
+                    updatePreview();
+                    
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Template Direset!',
+                        text: 'Template berhasil dikembalikan ke default',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                }
+            });
+        }
+
+        // Switch admin tabs
+        function switchAdminTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.admin-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+            
+            // Update tab content
+            document.querySelectorAll('.admin-tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            document.getElementById(`admin-${tabName}-tab`).classList.remove('hidden');
+            
+            if (tabName === 'template') {
+                loadTemplate();
+            } else if (tabName === 'share') {
+                updatePreview();
+            }
+        }
+
+        // Switch input mode (single/multi)
+        function switchInputMode(mode) {
+            // Update mode buttons
+            document.querySelectorAll('.input-mode-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(`mode-${mode}`).classList.add('active');
+            
+            // Update input sections
+            if (mode === 'single') {
+                document.getElementById('single-input-section').classList.remove('hidden');
+                document.getElementById('multi-input-section').classList.add('hidden');
+                updatePreview();
+            } else {
+                document.getElementById('single-input-section').classList.add('hidden');
+                document.getElementById('multi-input-section').classList.remove('hidden');
+                document.getElementById('multi-names-list').classList.add('hidden');
+            }
+        }
+
+        // Process multiple names
+        function processMultiNames() {
+            const textarea = document.getElementById('multi-guest-names');
+            const namesText = textarea.value.trim();
+            
+            if (!namesText) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Daftar Nama Kosong',
+                    text: 'Mohon masukkan daftar nama tamu terlebih dahulu',
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
+            
+            // Split by lines and filter empty names
+            const names = namesText.split('\n')
+                .map(name => name.trim())
+                .filter(name => name.length > 0);
+            
+            if (names.length === 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Tidak Ada Nama Valid',
+                    text: 'Mohon pastikan ada nama yang valid dalam daftar',
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
+            
+            // Update count
+            document.getElementById('names-count').textContent = names.length;
+            
+            // Generate names list
+            const container = document.getElementById('names-container');
+            container.innerHTML = names.map((name, index) => `
+                <div class="name-item bg-gray-900 p-3 rounded-lg border border-gray-700 flex justify-between items-center">
+                    <div class="flex items-center">
+                        <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-bold mr-3">
+                            ${index + 1}
+                        </div>
+                        <span class="text-white font-medium">${name}</span>
+                    </div>
+                    <button onclick="shareIndividualInvitation('${name.replace(/'/g, "\\'")}')" 
+                            class="bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-lg text-sm font-semibold transition-all duration-300">
+                        <i class="fab fa-whatsapp mr-1"></i>Share
+                    </button>
+                </div>
+            `).join('');
+            
+            // Show the list
+            document.getElementById('multi-names-list').classList.remove('hidden');
+            
+            Swal.fire({
+                icon: 'success',
+                title: 'Daftar Nama Diproses!',
+                text: `${names.length} nama berhasil diproses dan siap untuk dibagikan`,
+                confirmButtonText: 'OK'
+            });
+        }
+
+        // Share individual invitation from multi-name list
+        function shareIndividualInvitation(guestName) {
+            const baseUrl = window.location.origin + window.location.pathname;
+            const personalUrl = `${baseUrl}?to=${encodeURIComponent(guestName)}`;
+            
+            const message = messageTemplate
+                .replace(/{nama}/g, guestName)
+                .replace(/{link}/g, personalUrl)
+                .replace(/{mempelai}/g, 'Camelia & Fikri')
+                .replace(/{tanggal}/g, 'Sabtu, 18 Oktober 2025');
+            
+            const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+            window.open(whatsappUrl, '_blank');
+            
+            // Show success toast
+            Swal.fire({
+                icon: 'success',
+                title: 'Undangan Dibagikan!',
+                text: `Undangan untuk ${guestName} telah dibuka di WhatsApp`,
+                timer: 2000,
+                showConfirmButton: false,
+                toast: true,
+                position: 'top-end'
+            });
+        }
+
+        // Share all invitations
+        function shareAllInvitations() {
+            const namesContainer = document.getElementById('names-container');
+            const nameItems = namesContainer.querySelectorAll('.name-item');
+            
+            if (nameItems.length === 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Tidak Ada Nama',
+                    text: 'Tidak ada nama dalam daftar untuk dibagikan',
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
+            
+            Swal.fire({
+                title: 'Bagikan Semua Undangan?',
+                text: `Apakah Anda yakin ingin membagikan ${nameItems.length} undangan sekaligus? Ini akan membuka banyak tab WhatsApp.`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Bagikan Semua',
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#10b981'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    let delay = 0;
+                    nameItems.forEach((item, index) => {
+                        const nameSpan = item.querySelector('span');
+                        const guestName = nameSpan.textContent;
+                        
+                        setTimeout(() => {
+                            shareIndividualInvitation(guestName);
+                        }, delay);
+                        
+                        delay += 500; // 500ms delay between each share
+                    });
+                    
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Semua Undangan Dibagikan!',
+                        text: `${nameItems.length} undangan telah dibuka di WhatsApp dengan jeda waktu`,
+                        confirmButtonText: 'OK'
+                    });
+                }
+            });
+        }
+
+        // Update message preview
+        function updatePreview() {
+            const guestName = document.getElementById('guest-name-input').value.trim() || '[Nama Tamu]';
+            const baseUrl = window.location.origin + window.location.pathname;
+            const personalUrl = `${baseUrl}?to=${encodeURIComponent(guestName)}`;
+            
+            let preview = messageTemplate
+                .replace(/{nama}/g, guestName)
+                .replace(/{link}/g, personalUrl)
+                .replace(/{mempelai}/g, 'Camelia & Fikri')
+                .replace(/{tanggal}/g, 'Sabtu, 18 Oktober 2025');
+            
+            document.getElementById('message-preview').textContent = preview;
+        }
         
         // Check URL parameters for guest name
         function checkGuestParameter() {
@@ -803,16 +1291,25 @@
         
         // Admin mode toggle
         function toggleAdminMode() {
-            const adminControls = document.getElementById('admin-controls');
-            
-            if (adminControls.classList.contains('hidden')) {
-                adminControls.classList.remove('hidden');
-                isAdmin = true;
-            } else {
-                adminControls.classList.add('hidden');
-                isAdmin = false;
-            }
+            const adminModal = document.getElementById('admin-modal');
+            adminModal.classList.add('active');
+            isAdmin = true;
+            updatePreview();
         }
+
+        // Close admin modal
+        function closeAdminModal() {
+            const adminModal = document.getElementById('admin-modal');
+            adminModal.classList.remove('active');
+            isAdmin = false;
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('admin-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeAdminModal();
+            }
+        });
         
         // Share personal invitation (Admin only)
         function sharePersonalInvitation() {
@@ -831,25 +1328,18 @@
             const baseUrl = window.location.origin + window.location.pathname;
             const personalUrl = `${baseUrl}?to=${encodeURIComponent(guestName)}`;
             
-            const message = `🌸 *Undangan Pernikahan* 🌸
-
-*Camelia & Fikri*
-Sabtu, 18 Oktober 2025
-
-Kepada Yth. *${guestName}*
-
-Dengan penuh sukacita, kami mengundang Anda untuk berbagi kebahagiaan di hari istimewa kami.
-
-Klik link berikut untuk melihat undangan:
-${personalUrl}
-
-Terima kasih 🙏`;
+            const message = messageTemplate
+                .replace(/{nama}/g, guestName)
+                .replace(/{link}/g, personalUrl)
+                .replace(/{mempelai}/g, 'Camelia & Fikri')
+                .replace(/{tanggal}/g, 'Sabtu, 18 Oktober 2025');
             
             const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
             window.open(whatsappUrl, '_blank');
             
             // Clear input
             document.getElementById('guest-name-input').value = '';
+            updatePreview();
             
             Swal.fire({
                 icon: 'success',
@@ -1104,8 +1594,6 @@ Terima kasih 🙏`;
         // Listen for scroll events
         window.addEventListener('scroll', updateActiveNav);
         
-
-        
         // Animation observer
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
@@ -1134,7 +1622,22 @@ Terima kasih 🙏`;
                     document.getElementById('no-messages').style.display = 'block';
                 }
             }, 1000);
+            
+            // Add event listeners for template editing
+            const guestNameInput = document.getElementById('guest-name-input');
+            const templateTextarea = document.getElementById('message-template');
+            
+            if (guestNameInput) {
+                guestNameInput.addEventListener('input', updatePreview);
+            }
+            
+            if (templateTextarea) {
+                templateTextarea.addEventListener('input', function() {
+                    messageTemplate = this.value;
+                    updatePreview();
+                });
+            }
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'979c1da694c8ce61',t:'MTc1Njk3NDUzMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'979c52c2f733fd07',t:'MTc1Njk3NjcwNy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
