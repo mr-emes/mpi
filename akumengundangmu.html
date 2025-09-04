@@ -77,6 +77,7 @@
     </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         .playfair { font-family: 'Playfair Display', serif; }
         .poppins { font-family: 'Poppins', sans-serif; }
@@ -184,6 +185,65 @@
         
         .nav-item:active {
             transform: scale(0.95);
+        }
+
+        /* Custom SweetAlert styling */
+        .swal2-popup {
+            font-family: 'Poppins', sans-serif !important;
+            border-radius: 20px !important;
+            background: linear-gradient(135deg, rgba(0,0,0,0.9), rgba(30,30,30,0.9)) !important;
+            border: 2px solid #f59e0b !important;
+            backdrop-filter: blur(15px) !important;
+        }
+        
+        .swal2-title {
+            font-family: 'Playfair Display', serif !important;
+            color: #ffffff !important;
+            font-size: 1.8rem !important;
+        }
+        
+        .swal2-html-container {
+            color: #e5e7eb !important;
+            font-size: 1rem !important;
+        }
+        
+        .swal2-confirm {
+            background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+            border: none !important;
+            border-radius: 25px !important;
+            padding: 12px 30px !important;
+            font-weight: 600 !important;
+            font-size: 1rem !important;
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3) !important;
+        }
+        
+        .swal2-confirm:hover {
+            background: linear-gradient(135deg, #d97706, #b45309) !important;
+            transform: translateY(-2px) !important;
+        }
+        
+        .swal2-cancel {
+            background: linear-gradient(135deg, #6b7280, #4b5563) !important;
+            border: none !important;
+            border-radius: 25px !important;
+            padding: 12px 30px !important;
+            font-weight: 600 !important;
+            font-size: 1rem !important;
+        }
+        
+        .swal2-icon.swal2-success {
+            border-color: #10b981 !important;
+            color: #10b981 !important;
+        }
+        
+        .swal2-icon.swal2-error {
+            border-color: #ef4444 !important;
+            color: #ef4444 !important;
+        }
+        
+        .swal2-icon.swal2-info {
+            border-color: #3b82f6 !important;
+            color: #3b82f6 !important;
         }
     </style>
 </head>
@@ -782,7 +842,12 @@
             const guestName = document.getElementById('guest-name-input').value.trim();
             
             if (!guestName) {
-                alert('Mohon masukkan nama tamu terlebih dahulu');
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Nama Tamu Diperlukan',
+                    text: 'Mohon masukkan nama tamu terlebih dahulu',
+                    confirmButtonText: 'OK'
+                });
                 return;
             }
             
@@ -808,6 +873,13 @@ Terima kasih 🙏`;
             
             // Clear input
             document.getElementById('guest-name-input').value = '';
+            
+            Swal.fire({
+                icon: 'success',
+                title: 'Undangan Dibagikan!',
+                text: 'Link undangan personal telah dibuka di WhatsApp',
+                confirmButtonText: 'OK'
+            });
         }
         
         // Countdown timer
@@ -837,10 +909,18 @@ Terima kasih 🙏`;
         setInterval(updateCountdown, 1000);
         updateCountdown();
         
-        // Copy to clipboard function
+        // Copy to clipboard function with SweetAlert
         function copyToClipboard(text, type) {
             navigator.clipboard.writeText(text).then(() => {
-                alert(`Tersalin! ${type} berhasil disalin ke clipboard.`);
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil Disalin!',
+                    text: `${type} berhasil disalin ke clipboard`,
+                    timer: 2000,
+                    showConfirmButton: false,
+                    toast: true,
+                    position: 'top-end'
+                });
             }).catch(() => {
                 // Fallback for older browsers
                 const textArea = document.createElement('textarea');
@@ -849,7 +929,16 @@ Terima kasih 🙏`;
                 textArea.select();
                 document.execCommand('copy');
                 document.body.removeChild(textArea);
-                alert(`Tersalin! ${type} berhasil disalin ke clipboard.`);
+                
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil Disalin!',
+                    text: `${type} berhasil disalin ke clipboard`,
+                    timer: 2000,
+                    showConfirmButton: false,
+                    toast: true,
+                    position: 'top-end'
+                });
             });
         }
         
@@ -860,7 +949,7 @@ Terima kasih 🙏`;
             window.open(mapsUrl, '_blank');
         }
         
-        // RSVP Form handling with Firebase
+        // RSVP Form handling with Firebase and SweetAlert
         document.getElementById('rsvp-form').addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -869,9 +958,24 @@ Terima kasih 🙏`;
             const message = document.getElementById('guest-message').value;
             
             if (name.trim() === '') {
-                alert('Mohon isi nama lengkap Anda');
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Nama Diperlukan',
+                    text: 'Mohon isi nama lengkap Anda',
+                    confirmButtonText: 'OK'
+                });
                 return;
             }
+            
+            // Show loading
+            Swal.fire({
+                title: 'Mengirim Konfirmasi...',
+                text: 'Mohon tunggu sebentar',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
             
             try {
                 // Save to Firebase
@@ -886,7 +990,12 @@ Terima kasih 🙏`;
                 await window.firestore.addDoc(window.firestore.collection(window.db, 'rsvp'), rsvpData);
                 
                 // Show success message
-                alert('Terima kasih! Konfirmasi kehadiran Anda telah berhasil dikirim.');
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Terima Kasih! 💕',
+                    text: 'Konfirmasi kehadiran Anda telah berhasil dikirim',
+                    confirmButtonText: 'OK'
+                });
                 
                 // Reset form (but keep name if it's a personal invitation)
                 if (!currentGuest) {
@@ -898,7 +1007,12 @@ Terima kasih 🙏`;
                 
             } catch (error) {
                 console.error('Error saving RSVP:', error);
-                alert('Maaf, terjadi kesalahan. Silakan coba lagi.');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Terjadi Kesalahan',
+                    text: 'Maaf, terjadi kesalahan. Silakan coba lagi',
+                    confirmButtonText: 'OK'
+                });
             }
         });
         
@@ -1045,5 +1159,5 @@ Terima kasih 🙏`;
             }, 1000);
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'979bed835670a11e',t:'MTc1Njk3MjU2MC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'979bfbe2e46d5653',t:'MTc1Njk3MzE0OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
