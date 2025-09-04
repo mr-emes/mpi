@@ -1,0 +1,1876 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎪 SUPER QUIZ SHOW - Game Show Spektakuler!</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka+One:wght@400&family=Poppins:wght@300;400;600;700;800&family=Amiri:wght@400;700&display=swap');
+        
+        .show-font {
+            font-family: 'Fredoka One', cursive;
+        }
+        
+        .content-font {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .arabic-font {
+            font-family: 'Amiri', serif;
+            direction: ltr;
+            text-align: left;
+            unicode-bidi: plaintext;
+        }
+        
+        .neon-glow {
+            text-shadow: 0 0 10px #ff00ff, 0 0 20px #ff00ff, 0 0 30px #ff00ff;
+            animation: neon-flicker 2s infinite alternate;
+        }
+        
+        @keyframes neon-flicker {
+            0%, 100% { text-shadow: 0 0 10px #ff00ff, 0 0 20px #ff00ff, 0 0 30px #ff00ff; }
+            50% { text-shadow: 0 0 5px #ff00ff, 0 0 10px #ff00ff, 0 0 15px #ff00ff; }
+        }
+        
+        .spotlight {
+            background: radial-gradient(circle at center, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0.1) 40%, transparent 70%);
+            animation: spotlight-move 4s ease-in-out infinite;
+        }
+        
+        @keyframes spotlight-move {
+            0%, 100% { transform: translateX(-20px); }
+            50% { transform: translateX(20px); }
+        }
+        
+        .stage-lights {
+            background: linear-gradient(45deg, #ff0080, #8000ff, #0080ff, #00ff80, #ff8000);
+            background-size: 400% 400%;
+            animation: stage-lights 3s ease infinite;
+        }
+        
+        @keyframes stage-lights {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .host-bounce {
+            animation: host-bounce 2s ease-in-out infinite;
+        }
+        
+        @keyframes host-bounce {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .prize-spin {
+            animation: prize-spin 3s linear infinite;
+        }
+        
+        @keyframes prize-spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .audience-cheer {
+            animation: audience-cheer 1s ease-in-out;
+        }
+        
+        @keyframes audience-cheer {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .dramatic-entrance {
+            animation: dramatic-entrance 1s ease-out;
+        }
+        
+        @keyframes dramatic-entrance {
+            0% { transform: scale(0) rotate(180deg); opacity: 0; }
+            50% { transform: scale(1.2) rotate(90deg); opacity: 0.8; }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+        
+        .money-rain {
+            position: absolute;
+            font-size: 24px;
+            animation: money-fall 3s linear infinite;
+        }
+        
+        @keyframes money-fall {
+            0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+        }
+        
+        .buzzer-effect {
+            animation: buzzer-shake 0.5s ease-in-out;
+        }
+        
+        @keyframes buzzer-shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+        
+        .correct-celebration {
+            animation: correct-celebration 1s ease-out;
+        }
+        
+        @keyframes correct-celebration {
+            0% { transform: scale(1) rotate(0deg); }
+            25% { transform: scale(1.2) rotate(-5deg); }
+            50% { transform: scale(1.3) rotate(5deg); }
+            75% { transform: scale(1.1) rotate(-2deg); }
+            100% { transform: scale(1) rotate(0deg); }
+        }
+        
+        .slide-up {
+            animation: slide-up 0.5s ease-out;
+        }
+        
+        @keyframes slide-up {
+            0% { transform: translateY(100%); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+        
+        .fade-out {
+            animation: fade-out 0.5s ease-out forwards;
+        }
+        
+        @keyframes fade-out {
+            0% { transform: translateY(0); opacity: 1; }
+            100% { transform: translateY(-100%); opacity: 0; }
+        }
+        
+        .question-container {
+            background: #1a1a1a !important;
+            border: 2px solid #fcd34d !important;
+        }
+
+.team-active {
+    box-shadow: 0 0 0 4px #fcd34d;
+    transform: scale(1.05);
+    transition: all 0.3s ease;
+}
+
+    </style>
+</head>
+<body class="bg-gradient-to-br from-emerald-400 via-teal-500 to-cyan-600 min-h-screen content-font overflow-x-hidden">
+    <!-- Money Rain Container -->
+    <div id="money-rain" class="fixed inset-0 pointer-events-none z-50"></div>
+    
+    <!-- Stage Lights -->
+    <div class="fixed top-0 left-0 w-full h-2 stage-lights z-40"></div>
+    <div class="fixed bottom-0 left-0 w-full h-2 stage-lights z-40"></div>
+    
+    <!-- Spotlight Effect -->
+    <div class="fixed inset-0 spotlight pointer-events-none z-30"></div>
+
+    <!-- PENGATURAN SECTION -->
+    <div id="settings-section" class="relative z-20 min-h-screen">
+        <!-- Header -->
+        <div class="text-center py-8">
+            <h1 class="text-6xl font-bold text-yellow-400 neon-glow show-font mb-4">
+                🎪 SUPER QUIZ SHOW 🎪
+            </h1>
+            <p class="text-2xl text-white font-semibold">Atur Quiz Show Sebelum Memulai</p>
+        </div>
+
+        <div class="max-w-6xl mx-auto px-6 pb-8">
+            <!-- Pengaturan Tim -->
+            <div class="bg-gradient-to-br from-indigo-600 to-purple-700 rounded-3xl p-8 mb-8 border-8 border-yellow-400 shadow-2xl">
+                <h2 class="text-3xl font-bold text-yellow-400 text-center mb-6 show-font">👥 PENGATURAN TIM</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Tim 1 -->
+                    <div class="bg-white/10 rounded-xl p-6">
+                        <h3 class="text-2xl font-bold text-red-300 mb-4 flex items-center">
+                            🔥 Tim Pertama
+                        </h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-white font-semibold mb-2">Nama Tim:</label>
+                                <input type="text" id="team1-name" value="TIM MERAH" class="w-full px-4 py-3 rounded-lg bg-white/20 text-white placeholder-gray-300 border border-white/30 focus:border-yellow-400 focus:outline-none text-lg">
+                            </div>
+                            <div>
+                                <label class="block text-white font-semibold mb-2">Emoji/Icon:</label>
+                                <div class="flex gap-2 mb-2">
+                                    <input type="text" id="team1-icon" value="🔥" class="flex-1 px-4 py-3 rounded-lg bg-white/20 text-white placeholder-gray-300 border border-white/30 focus:border-yellow-400 focus:outline-none text-lg">
+                                    <button type="button" id="team1-emoji-btn" class="px-4 py-3 bg-yellow-500 hover:bg-yellow-600 rounded-lg text-white font-bold">📝</button>
+                                </div>
+                                <div id="team1-emoji-picker" class="hidden grid grid-cols-8 gap-1 p-2 bg-white/10 rounded-lg">
+                                    <button type="button" class="emoji-option p-2 hover:bg-white/20 rounded text-xl" data-emoji="🔥">🔥</button>
+                                    <button type="button" class="emoji-option p-2 hover:bg-white/20 rounded text-xl" data-emoji="⚡">⚡</button>
+                                    <button type="button" class="emoji-option p-2 hover:bg-white/20 rounded text-xl" data-emoji="🚀">🚀</button>
+                                    <button type="button" class="emoji-option p-2 hover:bg-white/20 rounded text-xl" data-emoji="⭐">⭐</button>
+                                    <button type="button" class="emoji-option p-2 hover:bg-white/20 rounded text-xl" data-emoji="💎">💎</button>
+                                    <button type="button" class="emoji-option p-2 hover:bg-white/20 rounded text-xl" data-emoji="🏆">🏆</button>
+                                    <button type="button" class="emoji-option p-2 hover:bg-white/20 rounded text-xl" data-emoji="🎯">🎯</button>
+                                    <button type="button" class="emoji-option p-2 hover:bg-white/20 rounded text-xl" data-emoji="🌟">🌟</button>
+                                    <button type="button" class="emoji-option p-2 hover:bg-white/20 rounded text-xl" data-emoji="💪">💪</button>
+                                    <button type="button" class="emoji-option p-2 hover:bg-white/20 rounded text-xl" data-emoji="🎪">🎪</button>
+                                    <button type="button" class="emoji-option p-2 hover:bg-white/20 rounded text-xl" data-emoji="🎭">🎭</button>
+                                    <button type="button" class="emoji-option p-2 hover:bg-white/20 rounded text-xl" data-emoji="🎨">🎨</button>
+                                    <button type="button" class="emoji-option p-2 hover:bg-white/20 rounded text-xl" data-emoji="🎵">🎵</button>
+                                    <button type="button" class="emoji-option p-2 hover:bg-white/20 rounded text-xl" data-emoji="🎸">🎸</button>
+                                    <button type="button" class="emoji-option p-2 hover:bg-white/20 rounded text-xl" data-emoji="🎲">🎲</button>
+                                    <button type="button" class="emoji-option p-2 hover:bg-white/20 rounded text-xl" data-emoji="🎮">🎮</button>
+                                    <button type="button" class="emoji-option p-2 hover:bg-white/20 rounded text-xl" data-emoji="🦁">🦁</button>
+                                    <button type="button" class="emoji-option p-2 hover:bg-white/20 rounded text-xl" data-emoji="🐯">🐯</button>
+                                    <button type="button" class="emoji-option p-2 hover:bg-white/20 rounded text-xl" data-emoji="🦅">🦅</button>
+                                    <button type="button" class="emoji-option p-2 hover:bg-white/20 rounded text-xl" data-emoji="🐺">🐺</button>
+                                    <button type="button" class="emoji-option p-2 hover:bg-white/20 rounded text-xl" data-emoji="🐉">🐉</button>
+                                    <button type="button" class="emoji-option p-2 hover:bg-white/20 rounded text-xl" data-emoji="🦄">🦄</button>
+                                    <button type="button" class="emoji-option p-2 hover:bg-white/20 rounded text-xl" data-emoji="🌈">🌈</button>
+                                    <button type="button" class="emoji-option p-2 hover:bg-white/20 rounded text-xl" data-emoji="☀️">☀️</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Tim 2 -->
+                    <div class="bg-white/10 rounded-xl p-6">
+                        <h3 class="text-2xl font-bold text-blue-300 mb-4 flex items-center">
+                            ⚡ Tim Kedua
+                        </h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-white font-semibold mb-2">Nama Tim:</label>
+                                <input type="text" id="team2-name" value="TIM BIRU" class="w-full px-4 py-3 rounded-lg bg-white/20 text-white placeholder-gray-300 border border-white/30 focus:border-yellow-400 focus:outline-none text-lg">
+                            </div>
+                            <div>
+                                <label class="block text-white font-semibold mb-2">Emoji/Icon:</label>
+                                <div class="flex gap-2 mb-2">
+                                    <input type="text" id="team2-icon" value="⚡" class="flex-1 px-4 py-3 rounded-lg bg-white/20 text-white placeholder-gray-300 border border-white/30 focus:border-yellow-400 focus:outline-none text-lg">
+                                    <button type="button" id="team2-emoji-btn" class="px-4 py-3 bg-yellow-500 hover:bg-yellow-600 rounded-lg text-white font-bold">📝</button>
+                                </div>
+                                <div id="team2-emoji-picker" class="hidden grid grid-cols-8 gap-1 p-2 bg-white/10 rounded-lg">
+                                    <button type="button" class="emoji-option p-2 hover:bg-white/20 rounded text-xl" data-emoji="🔥">🔥</button>
+                                    <button type="button" class="emoji-option p-2 hover:bg-white/20 rounded text-xl" data-emoji="⚡">⚡</button>
+                                    <button type="button" class="emoji-option p-2 hover:bg-white/20 rounded text-xl" data-emoji="🚀">🚀</button>
+                                    <button type="button" class="emoji-option p-2 hover:bg-white/20 rounded text-xl" data-emoji="⭐">⭐</button>
+                                    <button type="button" class="emoji-option p-2 hover:bg-white/20 rounded text-xl" data-emoji="💎">💎</button>
+                                    <button type="button" class="emoji-option p-2 hover:bg-white/20 rounded text-xl" data-emoji="🏆">🏆</button>
+                                    <button type="button" class="emoji-option p-2 hover:bg-white/20 rounded text-xl" data-emoji="🎯">🎯</button>
+                                    <button type="button" class="emoji-option p-2 hover:bg-white/20 rounded text-xl" data-emoji="🌟">🌟</button>
+                                    <button type="button" class="emoji-option p-2 hover:bg-white/20 rounded text-xl" data-emoji="💪">💪</button>
+                                    <button type="button" class="emoji-option p-2 hover:bg-white/20 rounded text-xl" data-emoji="🎪">🎪</button>
+                                    <button type="button" class="emoji-option p-2 hover:bg-white/20 rounded text-xl" data-emoji="🎭">🎭</button>
+                                    <button type="button" class="emoji-option p-2 hover:bg-white/20 rounded text-xl" data-emoji="🎨">🎨</button>
+                                    <button type="button" class="emoji-option p-2 hover:bg-white/20 rounded text-xl" data-emoji="🎵">🎵</button>
+                                    <button type="button" class="emoji-option p-2 hover:bg-white/20 rounded text-xl" data-emoji="🎸">🎸</button>
+                                    <button type="button" class="emoji-option p-2 hover:bg-white/20 rounded text-xl" data-emoji="🎲">🎲</button>
+                                    <button type="button" class="emoji-option p-2 hover:bg-white/20 rounded text-xl" data-emoji="🎮">🎮</button>
+                                    <button type="button" class="emoji-option p-2 hover:bg-white/20 rounded text-xl" data-emoji="🦁">🦁</button>
+                                    <button type="button" class="emoji-option p-2 hover:bg-white/20 rounded text-xl" data-emoji="🐯">🐯</button>
+                                    <button type="button" class="emoji-option p-2 hover:bg-white/20 rounded text-xl" data-emoji="🦅">🦅</button>
+                                    <button type="button" class="emoji-option p-2 hover:bg-white/20 rounded text-xl" data-emoji="🐺">🐺</button>
+                                    <button type="button" class="emoji-option p-2 hover:bg-white/20 rounded text-xl" data-emoji="🐉">🐉</button>
+                                    <button type="button" class="emoji-option p-2 hover:bg-white/20 rounded text-xl" data-emoji="🦄">🦄</button>
+                                    <button type="button" class="emoji-option p-2 hover:bg-white/20 rounded text-xl" data-emoji="🌈">🌈</button>
+                                    <button type="button" class="emoji-option p-2 hover:bg-white/20 rounded text-xl" data-emoji="☀️">☀️</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pengaturan Soal -->
+            <div class="bg-gradient-to-br from-green-600 to-teal-700 rounded-3xl p-8 mb-8 border-8 border-yellow-400 shadow-2xl">
+                <h2 class="text-3xl font-bold text-yellow-400 text-center mb-6 show-font">📝 PENGATURAN SOAL</h2>
+                
+                <!-- Template Soal -->
+                <div class="mb-6">
+                    <h3 class="text-xl font-bold text-white mb-4">🎯 Daftar Template Soal:</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3" id="template-container">
+                        <!-- Template buttons will be populated here -->
+                    </div>
+                </div>
+
+                <!-- Import Information -->
+                <div class="mb-6">
+                    <h3 class="text-xl font-bold text-white mb-4">📚 Informasi Soal Import:</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-white font-semibold mb-2">Mata Pelajaran:</label>
+                            <input type="text" id="subject-name" placeholder="Contoh: Matematika" class="w-full px-4 py-2 rounded-lg bg-white/20 text-white placeholder-gray-300 border border-white/30 focus:border-yellow-400 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-white font-semibold mb-2">Kelas:</label>
+                            <input type="text" id="class-name" placeholder="Contoh: VII A" class="w-full px-4 py-2 rounded-lg bg-white/20 text-white placeholder-gray-300 border border-white/30 focus:border-yellow-400 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-white font-semibold mb-2">Materi:</label>
+                            <input type="text" id="material-name" placeholder="Contoh: Aljabar" class="w-full px-4 py-2 rounded-lg bg-white/20 text-white placeholder-gray-300 border border-white/30 focus:border-yellow-400 focus:outline-none">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Import Soal -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                        <label class="block text-white font-semibold mb-2">📊 Upload File Excel (.xlsx):</label>
+                        <input type="file" id="excel-file" accept=".xlsx,.xls" class="w-full px-4 py-2 rounded-lg bg-white/20 text-white border border-white/30 focus:border-yellow-400 focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-green-500 file:text-white file:font-semibold hover:file:bg-green-600">
+                        <p class="text-xs text-gray-300 mt-1">Format: Kategori | Pertanyaan | A | B | C | D | Jawaban | Poin</p>
+                    </div>
+                    <div>
+                        <label class="block text-white font-semibold mb-2">📁 Upload File JSON:</label>
+                        <input type="file" id="questions-file" accept=".json" class="w-full px-4 py-2 rounded-lg bg-white/20 text-white border border-white/30 focus:border-yellow-400 focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-yellow-500 file:text-white file:font-semibold hover:file:bg-yellow-600">
+                    </div>
+                </div>
+
+                <div class="flex gap-4 flex-wrap justify-center">
+                    <button id="import-questions" class="bg-gradient-to-r from-green-500 to-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-green-600 hover:to-green-700 transition-all duration-300 transform hover:scale-105">
+                        📥 Import Soal
+                    </button>
+                    <button id="download-template" class="bg-gradient-to-r from-teal-500 to-teal-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-teal-600 hover:to-teal-700 transition-all duration-300 transform hover:scale-105">
+                        📋 Download Template
+                    </button>
+                    <button id="clear-data" class="bg-gradient-to-r from-red-500 to-red-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-red-600 hover:to-red-700 transition-all duration-300 transform hover:scale-105">
+                        🗑️ Hapus Data
+                    </button>
+                </div>
+
+                <!-- Info Soal -->
+                <div class="mt-6 bg-white/10 rounded-xl p-4">
+                    <div class="grid grid-cols-2 gap-4 text-white text-center">
+                        <div>
+                            <span class="font-semibold">Total Soal:</span>
+                            <span id="total-questions" class="text-yellow-300 text-xl font-bold ml-2">10</span>
+                        </div>
+                        <div>
+                            <span class="font-semibold">Template Aktif:</span>
+                            <span id="active-template" class="text-yellow-300 text-xl font-bold ml-2">Umum</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pengaturan Game -->
+            <div class="bg-gradient-to-br from-pink-600 to-red-700 rounded-3xl p-8 mb-8 border-8 border-yellow-400 shadow-2xl">
+                <h2 class="text-3xl font-bold text-yellow-400 text-center mb-6 show-font">🎮 PENGATURAN GAME</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Timer -->
+                    <div class="bg-white/10 rounded-xl p-6">
+                        <h3 class="text-xl font-bold text-white mb-4">⏱️ Timer</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-white font-semibold mb-2">Waktu per Soal (detik):</label>
+                                <input type="number" id="timer-duration" value="30" min="10" max="120" class="w-full px-4 py-2 rounded-lg bg-white/20 text-white border border-white/30 focus:border-yellow-400 focus:outline-none">
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <input type="checkbox" id="auto-timer" checked class="w-5 h-5 text-yellow-400 bg-white/20 border-white/30 rounded focus:ring-yellow-400">
+                                <label class="text-white font-semibold">Timer Otomatis</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Suara -->
+                    <div class="bg-white/10 rounded-xl p-6">
+                        <h3 class="text-xl font-bold text-white mb-4">🎵 Suara</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-center space-x-3">
+                                <input type="checkbox" id="sound-effects" checked class="w-5 h-5 text-yellow-400 bg-white/20 border-white/30 rounded focus:ring-yellow-400">
+                                <label class="text-white font-semibold">Efek Suara</label>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <input type="checkbox" id="timer-sound" checked class="w-5 h-5 text-yellow-400 bg-white/20 border-white/30 rounded focus:ring-yellow-400">
+                                <label class="text-white font-semibold">Suara Timer</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Poin -->
+                    <div class="bg-white/10 rounded-xl p-6">
+                        <h3 class="text-xl font-bold text-white mb-4">🏆 Poin</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-white font-semibold mb-2">Poin per Soal:</label>
+                                <input type="number" id="points-per-question" value="100" min="10" max="1000" step="10" class="w-full px-4 py-2 rounded-lg bg-white/20 text-white border border-white/30 focus:border-yellow-400 focus:outline-none">
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <input type="checkbox" id="progressive-points" class="w-5 h-5 text-yellow-400 bg-white/20 border-white/30 rounded focus:ring-yellow-400">
+                                <label class="text-white font-semibold">Poin Bertambah</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tombol Mulai -->
+            <div class="text-center">
+                <button id="start-quiz-show" class="bg-gradient-to-r from-yellow-500 to-orange-600 text-white px-12 py-6 rounded-3xl font-bold text-3xl hover:from-yellow-600 hover:to-orange-700 transition-all duration-300 transform hover:scale-105 shadow-2xl border-8 border-white show-font">
+                    🎬 MULAI QUIZ SHOW! 🎬
+                </button>
+                <p class="text-white text-lg mt-4">Pastikan semua pengaturan sudah benar sebelum memulai!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- QUIZ SHOW SECTION -->
+    <div id="quiz-section" class="relative z-20 min-h-screen hidden">
+        <!-- Header Quiz Show -->
+        <div class="text-center py-2">
+            <h1 class="text-6xl font-bold text-yellow-400 neon-glow show-font mb-1">
+                🎪 SUPER QUIZ SHOW 🎪
+            </h1>
+            <p class="text-lg text-white font-semibold">Pertunjukan Kuis Paling Spektakuler!</p>
+        </div>
+
+        <!-- Team Scores -->
+        <div class="max-w-6xl mx-auto px-6 mb-2">
+            <div class="grid grid-cols-2 gap-2">
+                <!-- Tim 1 -->
+                <button id="team1-btn" class="team-btn bg-gradient-to-br from-red-500 to-pink-600 rounded-lg p-2 text-white shadow-lg transform hover:scale-105 transition-all duration-300 border border-yellow-300 cursor-pointer">
+                    <div class="text-center">
+                        <span class="text-lg" id="team1-icon-display">🔥</span>
+                        <span class="text-sm font-bold show-font mx-2" id="team1-name-display">TIM MERAH</span>
+                        <span class="text-lg font-bold" id="team1-score">0</span>
+                    </div>
+                </button>
+
+                <!-- Tim 2 -->
+                <button id="team2-btn" class="team-btn bg-gradient-to-br from-blue-500 to-cyan-600 rounded-lg p-2 text-white shadow-lg transform hover:scale-105 transition-all duration-300 border border-yellow-300 cursor-pointer">
+                    <div class="text-center">
+                        <span class="text-lg" id="team2-icon-display">⚡</span>
+                        <span class="text-sm font-bold show-font mx-2" id="team2-name-display">TIM BIRU</span>
+                        <span class="text-lg font-bold" id="team2-score">0</span>
+                    </div>
+                </button>
+            </div>
+        </div>
+
+        <!-- Question Stage -->
+        <div class="max-w-6xl mx-auto px-6 mb-2">
+            <div class="question-container rounded-xl p-4 shadow-xl dramatic-entrance" id="question-stage">
+                <!-- Question Header with 3 sections -->
+                <div class="grid grid-cols-3 gap-2 mb-4">
+                    <!-- Left: Category -->
+                    <div class="bg-white/10 rounded-lg p-2 text-center">
+                        <div class="text-sm font-bold text-white" id="question-category">🧠 KATEGORI UMUM</div>
+                    </div>
+                    
+                    <!-- Center: Prize -->
+                    <div class="bg-gradient-to-br from-yellow-400 to-orange-500 rounded-lg p-2 text-white shadow-lg text-center">
+                        <div class="text-lg font-bold" id="current-prize">🏆 100 POIN</div>
+                    </div>
+                    
+                    <!-- Right: Timer -->
+                    <div class="bg-gradient-to-br from-red-500 to-pink-600 rounded-lg p-2 text-white shadow-lg text-center">
+                        <div class="text-xl font-bold" id="timer">⏰ 30</div>
+                    </div>
+                </div>
+                
+                <!-- Question Text -->
+                <div class="text-center mb-6">
+                    <h3 class="text-4xl font-bold text-white leading-relaxed" id="question-text">
+                        Siap untuk pertanyaan pertama?
+                    </h3>
+                </div>
+                
+                <!-- Answer Buttons -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6" id="answer-container">
+                    <button class="answer-btn bg-gradient-to-r from-green-500 to-emerald-600 text-white p-8 rounded-lg text-2xl font-bold hover:from-green-600 hover:to-emerald-700 transform hover:scale-105 transition-all duration-300 shadow-lg border border-white" data-answer="A">
+                        A. Pilihan Pertama
+                    </button>
+                    <button class="answer-btn bg-gradient-to-r from-blue-500 to-sky-600 text-white p-8 rounded-lg text-2xl font-bold hover:from-blue-600 hover:to-sky-700 transform hover:scale-105 transition-all duration-300 shadow-lg border border-white" data-answer="B">
+                        B. Pilihan Kedua
+                    </button>
+                    <button class="answer-btn bg-gradient-to-r from-purple-500 to-violet-600 text-white p-8 rounded-lg text-2xl font-bold hover:from-purple-600 hover:to-violet-700 transform hover:scale-105 transition-all duration-300 shadow-lg border border-white" data-answer="C">
+                        C. Pilihan Ketiga
+                    </button>
+                    <button class="answer-btn bg-gradient-to-r from-pink-500 to-rose-600 text-white p-8 rounded-lg text-2xl font-bold hover:from-pink-600 hover:to-rose-700 transform hover:scale-105 transition-all duration-300 shadow-lg border border-white" data-answer="D">
+                        D. Pilihan Keempat
+                    </button>
+                </div>
+                
+                <!-- Control Panel -->
+                <div class="flex justify-center gap-2">
+                    <button id="next-question" class="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 py-2 rounded-lg font-bold text-sm hover:from-blue-600 hover:to-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg" title="Soal Berikutnya">
+                        ➡️ Next
+                    </button>
+                    <button id="pause-timer" class="bg-gradient-to-r from-purple-500 to-purple-600 text-white px-4 py-2 rounded-lg font-bold text-sm hover:from-purple-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg" title="Pause Timer">
+                        ⏸️ Pause
+                    </button>
+                    <button id="back-to-settings" class="bg-gradient-to-r from-gray-500 to-gray-600 text-white px-4 py-2 rounded-lg font-bold text-sm hover:from-gray-600 hover:to-gray-700 transition-all duration-300 transform hover:scale-105 shadow-lg" title="Kembali ke Pengaturan">
+                        ⚙️ Setting
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Winner Modal -->
+    <div id="winner-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-50">
+        <div class="bg-gradient-to-br from-yellow-400 to-orange-500 rounded-3xl p-8 text-center max-w-lg mx-4 border-8 border-white shadow-2xl dramatic-entrance">
+            <div class="text-8xl mb-4 animate-bounce">🏆</div>
+            <h2 class="text-4xl font-bold mb-4 show-font text-white" id="winner-announcement">PEMENANG!</h2>
+            <p class="text-xl text-white mb-6 font-semibold">Selamat! Quiz Show telah berakhir dengan spektakuler!</p>
+            <div class="text-6xl mb-4">🎊🎉🎊</div>
+            <button id="close-winner" class="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-4 rounded-xl font-bold text-xl hover:from-purple-700 hover:to-pink-700 transition-all duration-300 transform hover:scale-105">
+                Kembali ke Pengaturan
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Game State
+        let gameState = {
+            team1Score: 0,
+            team2Score: 0,
+            currentQuestion: 1,
+            totalQuestions: 10,
+            timeLeft: 30,
+            timerInterval: null,
+            showStarted: false,
+            team1Name: "TIM MERAH",
+            team1Icon: "🔥",
+            team2Name: "TIM BIRU", 
+            team2Icon: "⚡",
+            timerDuration: 30,
+            soundEnabled: true,
+            timerSoundEnabled: true,
+            autoTimer: true,
+            pointsPerQuestion: 100,
+            progressivePoints: false,
+            activeTemplate: "general",
+            questions: [],
+            activeTeam: 1
+        };
+
+        // Question Templates with metadata
+        const questionTemplates = {};
+        
+        // Template metadata for display
+        const templateMetadata = {};
+
+        // Audio variables
+        let audioContext;
+        let applauseAudio = null;
+        let buzzerAudio = null;
+
+        // Local Storage Functions
+        function saveToLocalStorage() {
+            const dataToSave = {
+                gameState: gameState,
+                questionTemplates: questionTemplates,
+                templateMetadata: templateMetadata,
+                settings: {
+                    team1Name: document.getElementById('team1-name').value,
+                    team1Icon: document.getElementById('team1-icon').value,
+                    team2Name: document.getElementById('team2-name').value,
+                    team2Icon: document.getElementById('team2-icon').value,
+                    timerDuration: document.getElementById('timer-duration').value,
+                    soundEffects: document.getElementById('sound-effects').checked,
+                    timerSound: document.getElementById('timer-sound').checked,
+                    autoTimer: document.getElementById('auto-timer').checked,
+                    pointsPerQuestion: document.getElementById('points-per-question').value,
+                    progressivePoints: document.getElementById('progressive-points').checked
+                }
+            };
+            localStorage.setItem('quizShowData', JSON.stringify(dataToSave));
+        }
+
+function loadFromLocalStorage() {
+    const savedData = localStorage.getItem('quizShowData');
+    if (savedData) {
+        try {
+            const data = JSON.parse(savedData);
+            
+            // Restore game state - dengan validasi
+            if (data.gameState) {
+                // Simpan questions terlebih dahulu untuk validasi
+                const savedQuestions = data.gameState.questions;
+                
+                // Hanya assign properties yang valid
+                const validProperties = [
+                    'team1Score', 'team2Score', 'currentQuestion', 'totalQuestions',
+                    'timeLeft', 'showStarted', 'team1Name', 'team1Icon', 'team2Name',
+                    'team2Icon', 'timerDuration', 'soundEnabled', 'timerSoundEnabled',
+                    'autoTimer', 'pointsPerQuestion', 'progressivePoints', 'activeTemplate',
+                    'activeTeam'
+                ];
+                
+                validProperties.forEach(prop => {
+                    if (data.gameState.hasOwnProperty(prop)) {
+                        gameState[prop] = data.gameState[prop];
+                    }
+                });
+                
+                // Validasi questions array sebelum assign
+                if (savedQuestions && Array.isArray(savedQuestions) && savedQuestions.length > 0) {
+                    gameState.questions = savedQuestions;
+                    gameState.totalQuestions = savedQuestions.length;
+                }
+            }
+            
+            // Restore templates and metadata dengan validasi
+            if (data.questionTemplates && typeof data.questionTemplates === 'object') {
+                Object.assign(questionTemplates, data.questionTemplates);
+            }
+            
+            if (data.templateMetadata && typeof data.templateMetadata === 'object') {
+                Object.assign(templateMetadata, data.templateMetadata);
+            }
+            
+            // Restore settings dengan validasi
+            if (data.settings) {
+                const settings = data.settings;
+                if (settings.team1Name) document.getElementById('team1-name').value = settings.team1Name;
+                if (settings.team1Icon) document.getElementById('team1-icon').value = settings.team1Icon;
+                if (settings.team2Name) document.getElementById('team2-name').value = settings.team2Name;
+                if (settings.team2Icon) document.getElementById('team2-icon').value = settings.team2Icon;
+                if (settings.timerDuration) document.getElementById('timer-duration').value = settings.timerDuration;
+                if (settings.soundEffects !== undefined) document.getElementById('sound-effects').checked = settings.soundEffects;
+                if (settings.timerSound !== undefined) document.getElementById('timer-sound').checked = settings.timerSound;
+                if (settings.autoTimer !== undefined) document.getElementById('auto-timer').checked = settings.autoTimer;
+                if (settings.pointsPerQuestion) document.getElementById('points-per-question').value = settings.pointsPerQuestion;
+                if (settings.progressivePoints !== undefined) document.getElementById('progressive-points').checked = settings.progressivePoints;
+            }
+            
+            return true;
+        } catch (error) {
+            console.error('Error loading saved data:', error);
+            // Hapus data yang corrupt
+            localStorage.removeItem('quizShowData');
+            return false;
+        }
+    }
+    return false;
+}
+
+        function renderTemplateButtons() {
+            const templateContainer = document.getElementById('template-container');
+            templateContainer.innerHTML = '';
+            
+            // Render all available templates
+            Object.keys(questionTemplates).forEach(templateKey => {
+                const metadata = templateMetadata[templateKey];
+                const btn = document.createElement('button');
+                btn.className = 'template-btn bg-gradient-to-r from-indigo-500 to-indigo-600 text-white px-3 py-2 rounded-lg font-semibold hover:from-indigo-600 hover:to-indigo-700 transition-all duration-300 transform hover:scale-105 text-sm';
+                btn.setAttribute('data-template', templateKey);
+                
+                if (metadata) {
+                    btn.innerHTML = `
+                        <div class="text-left">
+                            <div class="font-bold">${metadata.subject}</div>
+                            <div class="text-xs opacity-80">Kelas: ${metadata.class}</div>
+                            <div class="text-xs opacity-80">${metadata.material}</div>
+                            <div class="text-xs opacity-60">${questionTemplates[templateKey].length} soal</div>
+                        </div>
+                    `;
+                } else {
+                    btn.innerHTML = `📁 ${templateKey}`;
+                }
+                
+                btn.addEventListener('click', () => {
+                    loadTemplate(templateKey);
+                    document.querySelectorAll('.template-btn').forEach(b => b.classList.remove('ring-4', 'ring-yellow-400'));
+                    btn.classList.add('ring-4', 'ring-yellow-400');
+                });
+                
+                templateContainer.appendChild(btn);
+            });
+            
+            // Add delete buttons for custom templates
+            Object.keys(questionTemplates).forEach(templateKey => {
+                if (templateMetadata[templateKey]) {
+                    const btn = templateContainer.querySelector(`[data-template="${templateKey}"]`);
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'absolute top-1 right-1 bg-red-500 hover:bg-red-600 text-white rounded-full w-5 h-5 text-xs flex items-center justify-center';
+                    deleteBtn.innerHTML = '×';
+                    deleteBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        deleteTemplate(templateKey);
+                    };
+                    btn.style.position = 'relative';
+                    btn.appendChild(deleteBtn);
+                }
+            });
+        }
+        
+        function deleteTemplate(templateKey) {
+            if (confirm(`Hapus template "${templateMetadata[templateKey]?.subject || templateKey}"?`)) {
+                delete questionTemplates[templateKey];
+                delete templateMetadata[templateKey];
+                
+                // Switch to first available template
+                const remainingTemplates = Object.keys(questionTemplates);
+                if (remainingTemplates.length > 0) {
+                    loadTemplate(remainingTemplates[0]);
+                } else {
+                    // Create default template if none exists
+                    createDefaultTemplate();
+                }
+                
+                renderTemplateButtons();
+                saveToLocalStorage();
+            }
+        }
+        
+        function createDefaultTemplate() {
+            const defaultQuestions = [
+                {
+                    category: "🧠 PENGETAHUAN UMUM",
+                    question: "Apa nama planet terbesar di tata surya?",
+                    options: ["A. Saturnus", "B. Jupiter", "C. Neptunus", "D. Uranus"],
+                    correct: "B",
+                    prize: 100
+                },
+                {
+                    category: "🌍 GEOGRAFI",
+                    question: "Apa ibukota Indonesia?",
+                    options: ["A. Bandung", "B. Surabaya", "C. Jakarta", "D. Medan"],
+                    correct: "C",
+                    prize: 200
+                },
+                {
+                    category: "🔬 SAINS",
+                    question: "Apa rumus kimia air?",
+                    options: ["A. H2O", "B. CO2", "C. O2", "D. NaCl"],
+                    correct: "A",
+                    prize: 300
+                }
+            ];
+            
+            questionTemplates.default = defaultQuestions;
+            templateMetadata.default = {
+                subject: "Pengetahuan Umum",
+                class: "Semua Kelas",
+                material: "Umum"
+            };
+        }
+
+        function saveGameSession() {
+            if (gameState.showStarted) {
+                saveToLocalStorage();
+            }
+        }
+
+function checkForSavedSession() {
+    const savedData = localStorage.getItem('quizShowData');
+    if (savedData) {
+        try {
+            const data = JSON.parse(savedData);
+            if (data.gameState && data.gameState.showStarted) {
+                // Periksa apakah data questions valid
+                if (!data.gameState.questions || !Array.isArray(data.gameState.questions)) {
+                    console.warn('Data questions tidak valid dalam sesi tersimpan');
+                    return false;
+                }
+                
+                const resume = confirm('Ditemukan sesi permainan yang tersimpan. Apakah Anda ingin melanjutkan permainan?');
+                if (resume) {
+                    resumeGame();
+                    return true;
+                } else {
+                    // Clear saved session if user doesn't want to resume
+                    localStorage.removeItem('quizShowData');
+                }
+            }
+        } catch (error) {
+            console.error('Error checking saved session:', error);
+            // Hapus data corrupt
+            localStorage.removeItem('quizShowData');
+            return false;
+        }
+    }
+    return false;
+}
+
+
+function resumeGame() {
+    const savedData = JSON.parse(localStorage.getItem('quizShowData'));
+    if (savedData && savedData.gameState && savedData.gameState.showStarted) {
+        try {
+            // Restore complete game state
+            Object.assign(gameState, savedData.gameState);
+            
+            // Pastikan questions array valid
+            if (!gameState.questions || !Array.isArray(gameState.questions)) {
+                // Jika questions tidak valid, muat template default
+                const firstTemplate = Object.keys(questionTemplates)[0];
+                if (firstTemplate) {
+                    loadTemplate(firstTemplate);
+                } else {
+                    createDefaultTemplate();
+                }
+            }
+            
+            // Pastikan currentQuestion valid
+            if (gameState.currentQuestion > gameState.questions.length) {
+                gameState.currentQuestion = 1;
+            }
+            
+            // Switch to quiz view
+            document.getElementById('settings-section').classList.add('hidden');
+            document.getElementById('quiz-section').classList.remove('hidden');
+            
+            // Update displays
+            updateTeamDisplay();
+            updateQuizDisplay();
+            loadQuestion();
+            
+            // Resume timer if it was running
+            if (gameState.timeLeft > 0 && gameState.autoTimer && gameState.activeTeam) {
+                startTimer();
+            }
+            
+            updateHostMessage('Permainan dilanjutkan dari sesi sebelumnya!');
+        } catch (error) {
+            console.error('Error resuming game:', error);
+            alert('Error saat melanjutkan permainan. Membuka pengaturan...');
+            backToSettings();
+        }
+    }
+}
+
+        function clearAllData() {
+            const confirm_clear = confirm('Apakah Anda yakin ingin menghapus semua data tersimpan? Ini akan menghapus pengaturan, soal import, dan sesi permainan.');
+            if (confirm_clear) {
+                localStorage.removeItem('quizShowData');
+                
+                // Clear all templates and metadata
+                Object.keys(questionTemplates).forEach(key => {
+                    delete questionTemplates[key];
+                });
+                Object.keys(templateMetadata).forEach(key => {
+                    delete templateMetadata[key];
+                });
+                
+                // Create default template
+                createDefaultTemplate();
+                loadTemplate('default');
+                renderTemplateButtons();
+                
+                alert('Semua data berhasil dihapus!');
+            }
+        }
+
+        // Initialize
+ function init() {
+    // Initialize audio
+    initAudio();
+    
+    // Load saved data first
+    const hasData = loadFromLocalStorage();
+    
+    // Create default template if no templates exist
+    if (Object.keys(questionTemplates).length === 0) {
+        createDefaultTemplate();
+    }
+    
+    // Load first available template if no active template or questions invalid
+    if (!gameState.questions || !Array.isArray(gameState.questions) || gameState.questions.length === 0) {
+        const firstTemplate = Object.keys(questionTemplates)[0];
+        if (firstTemplate) {
+            loadTemplate(firstTemplate);
+        }
+    }
+    
+    // Pastikan currentQuestion valid
+    if (gameState.currentQuestion < 1 || gameState.currentQuestion > gameState.questions.length) {
+        gameState.currentQuestion = 1;
+    }
+    
+    // Render template buttons
+    renderTemplateButtons();
+    updateSettingsDisplay();
+    
+    // Setup emoji pickers
+    setupEmojiPickers();
+    
+    // Check for saved game session
+    setTimeout(() => {
+        checkForSavedSession();
+    }, 500);
+    
+    // Auto-save every 10 seconds during game
+    setInterval(() => {
+        if (gameState.showStarted) {
+            saveGameSession();
+        }
+    }, 10000);
+    
+    // Save settings when changed
+    document.querySelectorAll('input').forEach(input => {
+        input.addEventListener('change', () => {
+            if (!gameState.showStarted) {
+                saveToLocalStorage();
+            }
+        });
+    });
+}
+        function setupEmojiPickers() {
+            // Team 1 emoji picker
+            document.getElementById('team1-emoji-btn').addEventListener('click', () => {
+                const picker = document.getElementById('team1-emoji-picker');
+                picker.classList.toggle('hidden');
+            });
+            
+            document.getElementById('team1-emoji-picker').addEventListener('click', (e) => {
+                if (e.target.classList.contains('emoji-option')) {
+                    document.getElementById('team1-icon').value = e.target.dataset.emoji;
+                    document.getElementById('team1-emoji-picker').classList.add('hidden');
+                    saveToLocalStorage();
+                }
+            });
+            
+            // Team 2 emoji picker
+            document.getElementById('team2-emoji-btn').addEventListener('click', () => {
+                const picker = document.getElementById('team2-emoji-picker');
+                picker.classList.toggle('hidden');
+            });
+            
+            document.getElementById('team2-emoji-picker').addEventListener('click', (e) => {
+                if (e.target.classList.contains('emoji-option')) {
+                    document.getElementById('team2-icon').value = e.target.dataset.emoji;
+                    document.getElementById('team2-emoji-picker').classList.add('hidden');
+                    saveToLocalStorage();
+                }
+            });
+            
+            // Close emoji pickers when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('#team1-emoji-btn') && !e.target.closest('#team1-emoji-picker')) {
+                    document.getElementById('team1-emoji-picker').classList.add('hidden');
+                }
+                if (!e.target.closest('#team2-emoji-btn') && !e.target.closest('#team2-emoji-picker')) {
+                    document.getElementById('team2-emoji-picker').classList.add('hidden');
+                }
+            });
+        }
+
+        // Load Template
+        function loadTemplate(templateName) {
+            if (questionTemplates[templateName]) {
+                gameState.questions = [...questionTemplates[templateName]];
+                gameState.activeTemplate = templateName;
+                gameState.totalQuestions = gameState.questions.length;
+                
+                // Update points if progressive
+                if (gameState.progressivePoints) {
+                    gameState.questions.forEach((q, index) => {
+                        q.prize = gameState.pointsPerQuestion + (index * gameState.pointsPerQuestion);
+                    });
+                } else {
+                    gameState.questions.forEach(q => {
+                        q.prize = gameState.pointsPerQuestion;
+                    });
+                }
+                
+                updateSettingsDisplay();
+                saveToLocalStorage();
+                showMessage(`Template ${templateName.toUpperCase()} berhasil dimuat!`);
+            }
+        }
+
+        // Update Settings Display
+        function updateSettingsDisplay() {
+            document.getElementById('total-questions').textContent = gameState.totalQuestions;
+            document.getElementById('active-template').textContent = gameState.activeTemplate.charAt(0).toUpperCase() + gameState.activeTemplate.slice(1);
+        }
+
+        // Show Message
+        function showMessage(message) {
+            console.log(message);
+        }
+
+        // Start Quiz Show
+        function startQuizShow() {
+            // Validasi apakah ada soal yang dimuat
+            if (!gameState.questions || gameState.questions.length === 0) {
+                alert('Tidak ada soal yang dimuat! Silakan import soal terlebih dahulu.');
+                return;
+            }
+            
+            // Apply settings
+            applySettings();
+            
+            // Reset state permainan
+            gameState.currentQuestion = 1;
+            gameState.team1Score = 0;
+            gameState.team2Score = 0;
+            gameState.showStarted = false;
+            
+            // Acak soal dan opsi hanya jika ada soal
+            if (gameState.questions.length > 0) {
+                shuffleQuestionsAndOptions();
+            }
+            
+            // Hide settings, show quiz
+            document.getElementById('settings-section').classList.add('fade-out');
+            setTimeout(() => {
+                document.getElementById('settings-section').classList.add('hidden');
+                document.getElementById('quiz-section').classList.remove('hidden');
+                document.getElementById('quiz-section').classList.add('slide-up');
+                
+                // Initialize quiz
+                initializeQuiz();
+            }, 500);
+        }
+
+        // Apply Settings
+function applySettings() {
+    gameState.team1Name = document.getElementById('team1-name').value || "TIM MERAH";
+    gameState.team1Icon = document.getElementById('team1-icon').value || "🔥";
+    gameState.team2Name = document.getElementById('team2-name').value || "TIM BIRU";
+    gameState.team2Icon = document.getElementById('team2-icon').value || "⚡";
+    gameState.timerDuration = parseInt(document.getElementById('timer-duration').value) || 30;
+    gameState.soundEnabled = document.getElementById('sound-effects').checked;
+    gameState.timerSoundEnabled = document.getElementById('timer-sound').checked;
+    gameState.autoTimer = document.getElementById('auto-timer').checked;
+    gameState.pointsPerQuestion = parseInt(document.getElementById('points-per-question').value) || 100;
+    gameState.progressivePoints = document.getElementById('progressive-points').checked;
+    
+    // Hanya update poin jika progressive points diaktifkan
+    if (gameState.progressivePoints) {
+        gameState.questions.forEach((q, index) => {
+            q.prize = gameState.pointsPerQuestion + (index * gameState.pointsPerQuestion);
+        });
+    }
+    // Jika tidak, biarkan poin sesuai dengan yang diimport
+}
+
+        // Fungsi untuk mengacak array (Fisher-Yates shuffle)
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // Fungsi untuk mengacak soal dan opsi jawaban
+        function shuffleQuestionsAndOptions() {
+            // Pastikan ada soal yang bisa diacak
+            if (!gameState.questions || gameState.questions.length === 0) {
+                console.warn("Tidak ada soal untuk diacak!");
+                return;
+            }
+            
+            // Acak urutan soal
+            gameState.questions = shuffleArray([...gameState.questions]);
+            
+            // Acak urutan opsi untuk setiap soal
+            gameState.questions.forEach(question => {
+                // Pastikan soal memiliki struktur yang benar
+                if (!question.options || question.options.length < 4) {
+                    console.warn("Soal tidak memiliki opsi yang valid:", question);
+                    return;
+                }
+                
+                // Simpan jawaban yang benar
+                const correctAnswer = question.correct;
+                
+                // Ekstrak opsi tanpa huruf A., B., C., D.
+                const optionsWithoutPrefix = question.options.map(opt => {
+                    if (typeof opt === 'string' && opt.length >= 3) {
+                        return opt.substring(3);
+                    }
+                    return opt;
+                });
+                
+                // Gabungkan opsi dengan huruf jawaban
+                const optionsWithLetters = [
+                    { option: optionsWithoutPrefix[0], letter: 'A' },
+                    { option: optionsWithoutPrefix[1], letter: 'B' },
+                    { option: optionsWithoutPrefix[2], letter: 'C' },
+                    { option: optionsWithoutPrefix[3], letter: 'D' }
+                ];
+                
+                // Acak urutan opsi
+                const shuffledOptions = shuffleArray([...optionsWithLetters]);
+                
+                // Temukan huruf jawaban yang benar setelah pengacakan
+                const newCorrectIndex = shuffledOptions.findIndex(opt => opt.letter === correctAnswer);
+                const newCorrectLetter = ['A', 'B', 'C', 'D'][newCorrectIndex];
+                
+                // Update opsi dan jawaban yang benar
+                question.options = shuffledOptions.map((opt, index) => {
+                    return `${['A', 'B', 'C', 'D'][index]}. ${opt.option}`;
+                });
+                question.correct = newCorrectLetter;
+            });
+            
+            console.log("Soal dan opsi telah diacak!");
+        }
+
+        // Initialize Quiz
+function initializeQuiz() {
+    gameState.team1Score = 0;
+    gameState.team2Score = 0;
+    gameState.currentQuestion = 1;
+    gameState.timeLeft = gameState.timerDuration;
+    gameState.showStarted = true;
+    gameState.activeTeam = null; // Reset tim aktif
+    
+    updateTeamDisplay();
+    updateQuizDisplay();
+    loadQuestion();
+    // Jangan mulai timer di sini - timer akan dimulai saat tim dipilih
+    saveGameSession();
+    
+    updateHostMessage("Quiz Show dimulai! Pilih tim yang akan menjawab!");
+}
+
+
+        // Update Team Display
+        function updateTeamDisplay() {
+            document.getElementById('team1-name-display').textContent = gameState.team1Name;
+            document.getElementById('team1-icon-display').textContent = gameState.team1Icon;
+            document.getElementById('team2-name-display').textContent = gameState.team2Name;
+            document.getElementById('team2-icon-display').textContent = gameState.team2Icon;
+        }
+
+        // Update Quiz Display
+function updateQuizDisplay() {
+    document.getElementById('team1-score').textContent = gameState.team1Score;
+    document.getElementById('team2-score').textContent = gameState.team2Score;
+    document.getElementById('timer').textContent = "⏰ " + gameState.timeLeft;
+    
+    // Perbaikan: Pastikan currentQuestion valid sebelum mengakses questions array
+    if (gameState.currentQuestion <= gameState.totalQuestions && 
+        gameState.questions && 
+        gameState.questions.length >= gameState.currentQuestion) {
+        
+        const currentQ = gameState.questions[gameState.currentQuestion - 1];
+        if (currentQ) {
+            document.getElementById('current-prize').textContent = "🏆 " + (currentQ.prize || 100) + " POIN";
+        } else {
+            document.getElementById('current-prize').textContent = "🏆 100 POIN";
+        }
+    } else {
+        document.getElementById('current-prize').textContent = "🏆 100 POIN";
+    }
+}
+        // Load Question
+function loadQuestion() {
+    // Validasi apakah questions array valid
+    if (!gameState.questions || !Array.isArray(gameState.questions) || gameState.questions.length === 0) {
+        console.error("Tidak ada soal yang dimuat!");
+        
+        // Coba muat template yang tersedia
+        const availableTemplates = Object.keys(questionTemplates);
+        if (availableTemplates.length > 0) {
+            loadTemplate(availableTemplates[0]);
+            alert("Soal tidak valid, memuat template yang tersedia.");
+        } else {
+            createDefaultTemplate();
+            alert("Tidak ada soal, menggunakan soal default.");
+        }
+        return;
+    }
+    
+    if (gameState.currentQuestion > gameState.totalQuestions) {
+        endQuiz();
+        return;
+    }
+
+    // Pastikan currentQuestion valid
+    if (gameState.currentQuestion < 1 || gameState.currentQuestion > gameState.questions.length) {
+        gameState.currentQuestion = 1;
+    }
+
+    const question = gameState.questions[gameState.currentQuestion - 1];
+    
+    // Validasi struktur soal
+    if (!question || !question.options) {
+        console.error("Soal tidak valid:", question);
+        
+        // Coba muat ulang template
+        if (gameState.activeTemplate && questionTemplates[gameState.activeTemplate]) {
+            gameState.questions = [...questionTemplates[gameState.activeTemplate]];
+            loadQuestion(); // Coba lagi
+        } else {
+            alert("Soal tidak valid! Kembali ke pengaturan.");
+            backToSettings();
+        }
+        return;
+    }
+    
+    // Tampilkan kategori dengan ikon
+    const categoryIcon = question.categoryIcon || "🧠";
+    document.getElementById('question-category').innerHTML = 
+        `<span class="text-xl mr-2">${categoryIcon}</span> ${question.category || "KATEGORI"}`;
+    
+    const questionTextEl = document.getElementById('question-text');
+    questionTextEl.textContent = question.question || "Pertanyaan tidak tersedia";
+    
+    // Check if question contains Arabic text and apply Arabic font
+    const arabicRegex = /[\u0600-\u06FF]/;
+    if (arabicRegex.test(question.question)) {
+        questionTextEl.classList.add('arabic-font');
+    } else {
+        questionTextEl.classList.remove('arabic-font');
+    }
+
+    // Update answer options - nonaktifkan sampai tim dipilih
+    const answerButtons = document.querySelectorAll('.answer-btn');
+    answerButtons.forEach((btn, index) => {
+        if (index < question.options.length) {
+            btn.textContent = question.options[index];
+            btn.dataset.answer = ['A', 'B', 'C', 'D'][index];
+            btn.classList.remove('bg-green-600', 'bg-red-600');
+            btn.disabled = true; // Nonaktifkan sampai tim dipilih
+            btn.classList.remove('correct-celebration', 'buzzer-effect');
+            btn.style.background = '';
+            
+            // Apply Arabic font to options if they contain Arabic text
+            if (arabicRegex.test(question.options[index])) {
+                btn.classList.add('arabic-font');
+            } else {
+                btn.classList.remove('arabic-font');
+            }
+        } else {
+            // Jika opsi tidak ada, nonaktifkan tombol
+            btn.textContent = ['A', 'B', 'C', 'D'][index] + ". Opsi tidak tersedia";
+            btn.disabled = true;
+        }
+    });
+
+    // Update poin dari data soal (bukan dari pengaturan)
+    document.getElementById('current-prize').textContent = "🏆 " + (question.prize || 100) + " POIN";
+
+    // Reset timer display
+    gameState.timeLeft = gameState.timerDuration;
+    document.getElementById('timer').textContent = "⏰ " + gameState.timeLeft;
+
+    // Add dramatic entrance effect
+    const questionStage = document.getElementById('question-stage');
+    questionStage.classList.remove('dramatic-entrance');
+    setTimeout(() => questionStage.classList.add('dramatic-entrance'), 10);
+}
+
+        // Timer functions
+        let timerPaused = false;
+
+function startTimer() {
+    if (gameState.timerInterval) {
+        clearInterval(gameState.timerInterval);
+    }
+
+    gameState.timeLeft = gameState.timerDuration;
+    timerPaused = false;
+    
+    // Update tampilan timer
+    document.getElementById('timer').textContent = "⏰ " + gameState.timeLeft;
+    
+    if (gameState.autoTimer) {
+        gameState.timerInterval = setInterval(() => {
+            if (!timerPaused) {
+                gameState.timeLeft--;
+                document.getElementById('timer').textContent = "⏰ " + gameState.timeLeft;
+
+                if (gameState.timeLeft <= 10) {
+                    document.getElementById('timer').parentElement.classList.add('buzzer-effect');
+                    if (gameState.timerSoundEnabled) {
+                        generateTickSound();
+                    }
+                } else {
+                    document.getElementById('timer').parentElement.classList.remove('buzzer-effect');
+                }
+
+                if (gameState.timeLeft <= 0) {
+                    clearInterval(gameState.timerInterval);
+                    document.getElementById('timer').parentElement.classList.remove('buzzer-effect');
+                    updateHostMessage("Waktu habis! Mari lanjut ke soal berikutnya!");
+                    playBuzzer();
+                }
+                
+                // Save game state every second
+                saveGameSession();
+            }
+        }, 1000);
+    }
+}
+
+function pauseTimer() {
+    // Hanya izinkan pause jika timer sedang berjalan (ada tim aktif)
+    if (!gameState.activeTeam) {
+        updateHostMessage("Pilih tim terlebih dahulu!");
+        return;
+    }
+    
+    timerPaused = !timerPaused;
+    const btn = document.getElementById('pause-timer');
+    if (timerPaused) {
+        btn.innerHTML = "▶️ Resume";
+        updateHostMessage("Timer dijeda!");
+    } else {
+        btn.innerHTML = "⏸️ Pause";
+        updateHostMessage("Timer dilanjutkan!");
+    }
+}
+
+        // Team scoring
+function teamCorrect(teamNumber) {
+    // Set tim aktif
+    gameState.activeTeam = teamNumber;
+    updateHostMessage(`Giliran ${teamNumber === 1 ? gameState.team1Name : gameState.team2Name} untuk menjawab!`);
+    
+    // Aktifkan opsi jawaban
+    document.querySelectorAll('.answer-btn').forEach(btn => {
+        btn.disabled = false;
+    });
+    
+    // Mulai timer hanya jika autoTimer diaktifkan
+    if (gameState.autoTimer) {
+        startTimer();
+    }
+    
+    // Highlight tim yang aktif
+    document.getElementById('team1-btn').classList.remove('ring-4', 'ring-yellow-400');
+    document.getElementById('team2-btn').classList.remove('ring-4', 'ring-yellow-400');
+    
+    if (teamNumber === 1) {
+        document.getElementById('team1-btn').classList.add('ring-4', 'ring-yellow-400');
+    } else {
+        document.getElementById('team2-btn').classList.add('ring-4', 'ring-yellow-400');
+    }
+}
+
+        // Next Question
+function nextQuestion() {
+    if (gameState.timerInterval) {
+        clearInterval(gameState.timerInterval);
+    }
+    
+    // Reset status tim aktif
+    gameState.activeTeam = null;
+    document.getElementById('team1-btn').classList.remove('ring-4', 'ring-yellow-400');
+    document.getElementById('team2-btn').classList.remove('ring-4', 'ring-yellow-400');
+    
+    gameState.currentQuestion++;
+  gameState.timeLeft = gameState.timerDuration;
+    document.getElementById('timer').textContent = "⏰ " + gameState.timeLeft;
+    
+    // Nonaktifkan opsi jawaban sampai tim dipilih
+    document.querySelectorAll('.answer-btn').forEach(btn => {
+        btn.disabled = true;
+    });
+    
+    updateQuizDisplay();
+    loadQuestion();
+    
+    if (gameState.currentQuestion <= gameState.totalQuestions) {
+        updateHostMessage("Pilih tim yang akan menjawab soal berikutnya!");
+    }
+    
+    saveGameSession();
+}
+
+        // End Quiz
+        function endQuiz() {
+            if (gameState.timerInterval) {
+                clearInterval(gameState.timerInterval);
+            }
+
+            gameState.showStarted = false;
+            
+            let winner;
+            if (gameState.team1Score > gameState.team2Score) {
+                winner = `🔥 ${gameState.team1Name} JUARA! 🏆`;
+            } else if (gameState.team2Score > gameState.team1Score) {
+                winner = `⚡ ${gameState.team2Name} JUARA! 🏆`;
+            } else {
+                winner = "🤝 SERI SPEKTAKULER! 🏆";
+            }
+
+            document.getElementById('winner-announcement').textContent = winner;
+            document.getElementById('winner-modal').classList.remove('hidden');
+            document.getElementById('winner-modal').classList.add('flex');
+            
+            updateHostMessage("Terima kasih telah menonton Super Quiz Show!");
+            createMoneyRain();
+            
+            // Clear saved session
+            localStorage.removeItem('quizShowData');
+        }
+
+        // Back to Settings
+        function backToSettings() {
+            if (gameState.timerInterval) {
+                clearInterval(gameState.timerInterval);
+            }
+            
+            gameState.showStarted = false;
+            
+            document.getElementById('quiz-section').classList.add('fade-out');
+            setTimeout(() => {
+                document.getElementById('quiz-section').classList.add('hidden');
+                document.getElementById('settings-section').classList.remove('hidden', 'fade-out');
+                document.getElementById('settings-section').classList.add('slide-up');
+            }, 500);
+            
+            // Clear saved session when going back to settings
+            localStorage.removeItem('quizShowData');
+        }
+
+        // Host Message
+        function updateHostMessage(message) {
+            console.log("Host: " + message);
+        }
+
+        // Audio Functions
+        function initAudio() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            
+            // Load sound effects
+            if (!applauseAudio) {
+                applauseAudio = new Audio();
+                applauseAudio.src = 'https://archive.org/download/tepuk-meriah/crowd-cheer-in-school-auditorium-236699.mp3';
+                applauseAudio.volume = 0.7;
+                applauseAudio.preload = 'auto';
+                applauseAudio.load();
+            }
+            
+            if (!buzzerAudio) {
+                buzzerAudio = new Audio();
+                buzzerAudio.src = 'https://archive.org/download/tepuk-meriah/fail-jingle-stereo-mix-88784.mp3';
+                buzzerAudio.volume = 0.8;
+                buzzerAudio.preload = 'auto';
+                buzzerAudio.load();
+            }
+        }
+
+        function generateApplauseSound() {
+            if (gameState.soundEnabled) {
+                if (applauseAudio) {
+                    try {
+                        applauseAudio.currentTime = 0;
+                        applauseAudio.play().catch(e => {
+                            console.error("Error playing applause:", e);
+                            playFallbackApplause();
+                        });
+                    } catch (e) {
+                        console.error("Exception playing applause:", e);
+                        playFallbackApplause();
+                    }
+                } else {
+                    playFallbackApplause();
+                }
+            }
+        }
+
+        function generateBuzzerSound() {
+            if (gameState.soundEnabled) {
+                if (buzzerAudio) {
+                    try {
+                        buzzerAudio.currentTime = 0;
+                        buzzerAudio.play().catch(e => {
+                            console.error("Error playing buzzer:", e);
+                            playFallbackBuzzer();
+                        });
+                    } catch (e) {
+                        console.error("Exception playing buzzer:", e);
+                        playFallbackBuzzer();
+                    }
+                } else {
+                    playFallbackBuzzer();
+                }
+            }
+        }
+
+        // Fungsi fallback untuk applause
+        function playFallbackApplause() {
+            if (!audioContext) {
+                initAudio();
+            }
+            
+            const duration = 2;
+            const sampleRate = audioContext.sampleRate;
+            const buffer = audioContext.createBuffer(2, duration * sampleRate, sampleRate);
+            
+            for (let channel = 0; channel < 2; channel++) {
+                const data = buffer.getChannelData(channel);
+                for (let i = 0; i < buffer.length; i++) {
+                    // Create applause-like sound
+                    data[i] = (Math.random() * 2 - 1) * 0.3 * Math.sin(i * 0.01) * 
+                             (1 - (i / buffer.length)); // Fade out
+                }
+            }
+            
+            const source = audioContext.createBufferSource();
+            source.buffer = buffer;
+            source.connect(audioContext.destination);
+            source.start();
+        }
+
+        // Fungsi fallback untuk buzzer
+        function playFallbackBuzzer() {
+            if (!audioContext) {
+                initAudio();
+            }
+            
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.type = 'square';
+            oscillator.frequency.setValueAtTime(200, audioContext.currentTime);
+            oscillator.frequency.setValueAtTime(150, audioContext.currentTime + 0.1);
+            oscillator.frequency.setValueAtTime(100, audioContext.currentTime + 0.2);
+            
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.5);
+        }
+
+        function generateTickSound() {
+            initAudio();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+            gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.1);
+        }
+
+        function playApplause() {
+            updateHostMessage("👏 TEPUK TANGAN MERIAH! 👏");
+            generateApplauseSound();
+            createMoneyRain();
+        }
+
+        function playBuzzer() {
+            updateHostMessage("🚨 BUZZER! Jawaban salah atau waktu habis! 🚨");
+            generateBuzzerSound();
+            
+            document.body.classList.add('buzzer-effect');
+            setTimeout(() => {
+                document.body.classList.remove('buzzer-effect');
+            }, 500);
+        }
+
+        // Money Rain Effect
+        function createMoneyRain() {
+            const moneyRain = document.getElementById('money-rain');
+            const moneySymbols = ['💰', '💎', '🏆', '⭐', '💸', '🎁'];
+            
+            for (let i = 0; i < 20; i++) {
+                const money = document.createElement('div');
+                money.className = 'money-rain';
+                money.textContent = moneySymbols[Math.floor(Math.random() * moneySymbols.length)];
+                money.style.left = Math.random() * 100 + '%';
+                money.style.animationDelay = Math.random() * 2 + 's';
+                money.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                
+                moneyRain.appendChild(money);
+                
+                setTimeout(() => {
+                    money.remove();
+                }, 4000);
+            }
+        }
+
+        // Import Functions
+        function importQuestions() {
+            const excelInput = document.getElementById('excel-file');
+            const fileInput = document.getElementById('questions-file');
+            const subjectName = document.getElementById('subject-name').value.trim();
+            const className = document.getElementById('class-name').value.trim();
+            const materialName = document.getElementById('material-name').value.trim();
+            
+            if (!subjectName || !className || !materialName) {
+                alert('Harap isi Mata Pelajaran, Kelas, dan Materi sebelum import!');
+                return;
+            }
+            
+            if (excelInput.files.length > 0) {
+                const file = excelInput.files[0];
+                const reader = new FileReader();
+				reader.onload = function(e) {
+					try {
+						const data = new Uint8Array(e.target.result);
+						const workbook = XLSX.read(data, { type: 'array' });
+						const sheetName = workbook.SheetNames[0];
+						const worksheet = workbook.Sheets[sheetName];
+						const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+						
+						const customQuestions = [];
+						for (let i = 1; i < jsonData.length; i++) {
+							const row = jsonData[i];
+							if (row && row.length >= 8) {
+								// Ekstrak ikon dari kategori jika ada (format: [icon] Kategori)
+								let category = row[0] || "🧠 KATEGORI";
+								let categoryIcon = "🧠"; // Default icon
+								
+								// Cek jika kategori mengandung ikon (contoh: "⭐ MATEMATIKA")
+								const iconMatch = category.match(/^([^\w\s]+\s*)/);
+								if (iconMatch) {
+									categoryIcon = iconMatch[0].trim();
+									category = category.replace(iconMatch[0], '').trim();
+								}
+								
+								customQuestions.push({
+									category: category,
+									categoryIcon: categoryIcon, // Simpan ikon terpisah
+									question: row[1] || "Pertanyaan tidak tersedia",
+									options: [
+										"A. " + (row[2] || "Pilihan A"),
+										"B. " + (row[3] || "Pilihan B"), 
+										"C. " + (row[4] || "Pilihan C"),
+										"D. " + (row[5] || "Pilihan D")
+									],
+									correct: (row[6] || "A").toString().toUpperCase().trim(),
+									prize: parseInt(row[7]) || 100 // Gunakan poin dari kolom ke-8
+								});
+							}
+						}
+                        
+                        if (customQuestions.length > 0) {
+                            // Create unique template key
+                            const templateKey = `${subjectName}_${className}_${materialName}`.replace(/\s+/g, '_').toLowerCase();
+                            
+                            // Save questions and metadata
+                            questionTemplates[templateKey] = customQuestions;
+                            templateMetadata[templateKey] = {
+                                subject: subjectName,
+                                class: className,
+                                material: materialName
+                            };
+                            
+                            // Load the new template
+                            gameState.questions = [...customQuestions]; // Gunakan spread operator untuk copy
+                            gameState.totalQuestions = customQuestions.length;
+                            gameState.activeTemplate = templateKey;
+                            gameState.currentQuestion = 1; // Reset ke soal pertama
+                            
+                            // Clear input fields
+                            document.getElementById('subject-name').value = '';
+                            document.getElementById('class-name').value = '';
+                            document.getElementById('material-name').value = '';
+                            document.getElementById('excel-file').value = '';
+                            
+                            renderTemplateButtons();
+                            updateSettingsDisplay();
+                            saveToLocalStorage();
+                            
+                            alert(`Berhasil import ${customQuestions.length} soal untuk ${subjectName} - Kelas ${className}!`);
+                        } else {
+                            alert('Tidak ada data soal yang valid ditemukan dalam file Excel!');
+                        }
+                    } catch (error) {
+                        console.error('Error membaca file Excel:', error);
+                        alert('Error membaca file Excel: ' + error.message);
+                    }
+                };
+                reader.onerror = function() {
+                    alert('Error membaca file! Pastikan file tidak rusak.');
+                };
+                reader.readAsArrayBuffer(file);
+            } else if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const customQuestions = JSON.parse(e.target.result);
+                        
+                        // Validasi struktur data JSON
+                        if (!Array.isArray(customQuestions)) {
+                            throw new Error('Format JSON tidak valid. Harus berupa array.');
+                        }
+                        
+                        // Validasi setiap soal
+                        const validatedQuestions = customQuestions.map((q, index) => {
+                            return {
+                                category: q.category || "🧠 KATEGORI",
+                                question: q.question || `Pertanyaan ${index + 1}`,
+                                options: q.options || ["A. Pilihan A", "B. Pilihan B", "C. Pilihan C", "D. Pilihan D"],
+                                correct: (q.correct || "A").toString().toUpperCase().trim(),
+                                prize: parseInt(q.prize) || 100
+                            };
+                        });
+                        
+                        if (validatedQuestions.length > 0) {
+                            // Create unique template key
+                            const templateKey = `${subjectName}_${className}_${materialName}`.replace(/\s+/g, '_').toLowerCase();
+                            
+                            // Save questions and metadata
+                            questionTemplates[templateKey] = validatedQuestions;
+                            templateMetadata[templateKey] = {
+                                subject: subjectName,
+                                class: className,
+                                material: materialName
+                            };
+                            
+                            // Load the new template
+                            gameState.questions = [...validatedQuestions]; // Gunakan spread operator untuk copy
+                            gameState.totalQuestions = validatedQuestions.length;
+                            gameState.activeTemplate = templateKey;
+                            gameState.currentQuestion = 1; // Reset ke soal pertama
+                            
+                            // Clear input fields
+                            document.getElementById('subject-name').value = '';
+                            document.getElementById('class-name').value = '';
+                            document.getElementById('material-name').value = '';
+                            document.getElementById('questions-file').value = '';
+                            
+                            renderTemplateButtons();
+                            updateSettingsDisplay();
+                            saveToLocalStorage();
+                            
+                            alert(`Berhasil import ${validatedQuestions.length} soal untuk ${subjectName} - Kelas ${className}!`);
+                        } else {
+                            alert('Tidak ada data soal yang valid ditemukan dalam file JSON!');
+                        }
+                    } catch (error) {
+                        console.error('Error membaca file JSON:', error);
+                        alert('Error membaca file JSON: ' + error.message);
+                    }
+                };
+                reader.onerror = function() {
+                    alert('Error membaca file! Pastikan file tidak rusak.');
+                };
+                reader.readAsText(file);
+            } else {
+                alert('Silakan pilih file Excel atau JSON untuk diimport!');
+            }
+        }
+
+        function downloadTemplate() {
+            const templateData = [
+                ['Kategori', 'Pertanyaan', 'Pilihan A', 'Pilihan B', 'Pilihan C', 'Pilihan D', 'Jawaban', 'Poin'],
+                ['🧠 PENGETAHUAN UMUM', 'Apa nama planet terbesar di tata surya?', 'Saturnus', 'Jupiter', 'Neptunus', 'Uranus', 'B', 100],
+                ['🌍 GEOGRAFI', 'Apa ibukota Indonesia?', 'Bandung', 'Surabaya', 'Jakarta', 'Medan', 'C', 200],
+                ['🔬 SAINS', 'Apa rumus kimia air?', 'H2O', 'CO2', 'O2', 'NaCl', 'A', 300]
+            ];
+            
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(templateData);
+            
+            ws['!cols'] = [
+                { width: 20 }, { width: 50 }, { width: 20 }, { width: 20 }, 
+                { width: 20 }, { width: 20 }, { width: 10 }, { width: 10 }
+            ];
+            
+            XLSX.utils.book_append_sheet(wb, ws, 'Template Soal');
+            XLSX.writeFile(wb, 'Template_Soal_Quiz_Show.xlsx');
+            
+            alert('Template Excel berhasil didownload!');
+        }
+
+        // Event Listeners
+        document.getElementById('start-quiz-show').addEventListener('click', startQuizShow);
+        document.getElementById('team1-btn').addEventListener('click', () => teamCorrect(1));
+        document.getElementById('team2-btn').addEventListener('click', () => teamCorrect(2));
+        document.getElementById('next-question').addEventListener('click', nextQuestion);
+
+        document.getElementById('pause-timer').addEventListener('click', pauseTimer);
+        document.getElementById('back-to-settings').addEventListener('click', backToSettings);
+        document.getElementById('import-questions').addEventListener('click', importQuestions);
+        document.getElementById('download-template').addEventListener('click', downloadTemplate);
+        document.getElementById('clear-data').addEventListener('click', clearAllData);
+
+        // Template buttons are now handled in renderTemplateButtons()
+
+        // Winner modal
+        document.getElementById('close-winner').addEventListener('click', () => {
+            document.getElementById('winner-modal').classList.add('hidden');
+            document.getElementById('winner-modal').classList.remove('flex');
+            backToSettings();
+        });
+
+        // Answer button clicks
+document.getElementById('answer-container').addEventListener('click', (e) => {
+    if (e.target.classList.contains('answer-btn') && gameState.showStarted && !e.target.disabled) {
+        // Pastikan ada tim yang aktif
+        if (!gameState.activeTeam) {
+            updateHostMessage("Pilih tim terlebih dahulu sebelum menjawab!");
+            return;
+        }
+        
+        // Stop timer ketika jawaban dipilih
+        if (gameState.timerInterval) {
+            clearInterval(gameState.timerInterval);
+        }
+        
+        const question = gameState.questions[gameState.currentQuestion - 1];
+        const selectedAnswer = e.target.dataset.answer;
+        const isCorrect = selectedAnswer === question.correct;
+        
+        // Disable all buttons
+        document.querySelectorAll('.answer-btn').forEach(btn => {
+            btn.disabled = true;
+        });
+        
+        if (isCorrect) {
+            // Jawaban benar - mainkan applause
+            if (gameState.soundEnabled) {
+                console.log("Memainkan applause untuk jawaban benar");
+                playApplause();
+            }
+            e.target.classList.add('correct-celebration');
+            e.target.style.background = 'linear-gradient(45deg, #10b981, #059669)';
+            updateHostMessage("🎉 JAWABAN BENAR! Luar biasa! 🎉");
+            
+            // Tambahkan poin ke tim yang aktif
+            if (gameState.activeTeam === 1) {
+                gameState.team1Score += question.prize;
+            } else if (gameState.activeTeam === 2) {
+                gameState.team2Score += question.prize;
+            }
+            updateQuizDisplay();
+        } else {
+            // Jawaban salah - mainkan buzzer
+            if (gameState.soundEnabled) {
+                console.log("Memainkan buzzer untuk jawaban salah");
+                playBuzzer();
+            }
+            e.target.classList.add('buzzer-effect');
+            e.target.style.background = 'linear-gradient(45deg, #ef4444, #dc2626)';
+            
+            // Tampilkan jawaban yang benar
+            const correctBtn = document.querySelector(`.answer-btn[data-answer="${question.correct}"]`);
+            if (correctBtn) {
+                correctBtn.classList.add('correct-celebration');
+                correctBtn.style.background = 'linear-gradient(45deg, #10b981, #059669)';
+            }
+            
+            updateHostMessage("❌ Jawaban salah! Ini jawaban yang benar!");
+        }
+        
+        saveGameSession();
+    }
+});
+
+
+        // Initialize app
+        init();
+
+        // Error handling global
+        window.addEventListener('error', function(e) {
+            console.error('Error global:', e.error);
+        });
+
+        // Handle promise rejections yang tidak tertangkap
+        window.addEventListener('unhandledrejection', function(e) {
+            console.error('Promise rejection tidak tertangkap:', e.reason);
+        });
+
+        // Preload audio when page is loaded
+        window.addEventListener('load', function() {
+            // Preload audio files
+            initAudio();
+        });
+    </script>
+</body>
+</html>
