@@ -1,0 +1,2237 @@
+<!DOCTYPE html>
+<html lang="id" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelas Pak Mahfud - Sistem Tugas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        .arabic-text { font-family: 'Amiri', serif; }
+        .mobile-container { max-width: 414px; margin: 0 auto; }
+        .assignment-card { transition: all 0.3s ease; }
+        .assignment-card:hover { transform: translateY(-2px); }
+        .login-container { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen">
+    <div class="mobile-container bg-white min-h-screen shadow-xl">
+        
+        <!-- Login Screen -->
+        <div id="loginScreen" class="login-container flex items-center justify-center p-4">
+            <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-sm">
+                <div class="text-center mb-8">
+                    <div class="bg-gradient-to-r from-blue-500 to-purple-600 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-graduation-cap text-white text-3xl"></i>
+                    </div>
+                    <h1 class="text-2xl font-bold text-gray-800 mb-2">Kelas Pak Mahfud</h1>
+                    <p class="text-gray-600 text-sm">Masuk ke akun Anda</p>
+                </div>
+
+                <form onsubmit="handleLogin(event)" class="space-y-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            <i class="fas fa-user mr-2 text-gray-400"></i>
+                            NIS / Password Guru
+                        </label>
+                        <input 
+                            type="text" 
+                            id="loginInput" 
+                            required 
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                            placeholder="Masukkan NIS atau password guru"
+                        >
+                        <p class="text-xs text-gray-500 mt-1">
+                            Siswa: gunakan NIS | Guru: gunakan password khusus
+                        </p>
+                    </div>
+                    
+                    <button 
+                        type="submit" 
+                        class="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-3 px-4 rounded-lg font-medium hover:from-blue-600 hover:to-purple-700 transition-all duration-200 transform hover:scale-105"
+                    >
+                        <i class="fas fa-sign-in-alt mr-2"></i>
+                        Masuk
+                    </button>
+                </form>
+
+                <!-- Demo Credentials Info -->
+                <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div class="text-center">
+                        <h3 class="text-sm font-bold text-blue-800 mb-2">
+                            <i class="fas fa-info-circle mr-1"></i>
+                            Demo Login
+                        </h3>
+                        <div class="text-xs text-blue-700 space-y-1">
+                            <div><strong>Guru:</strong> guruhebat</div>
+                            <div><strong>Siswa:</strong> 12345, 67890, 11111, 22222, 33333</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Setup Instructions -->
+                <div class="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <div class="text-xs text-yellow-800">
+                        <h4 class="font-bold mb-2">
+                            <i class="fas fa-cog mr-1"></i>
+                            Setup Google Apps Script:
+                        </h4>
+                        <ol class="list-decimal list-inside space-y-1 text-xs">
+                            <li>Buat project baru di script.google.com</li>
+                            <li>Copy kode server-side yang diperlukan</li>
+                            <li>Deploy sebagai Web App dengan akses "Anyone"</li>
+                            <li>Update GOOGLE_SCRIPT_URL di kode ini</li>
+                            <li>Set USE_DEMO_MODE = false untuk production</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main App (Hidden initially) -->
+        <div id="mainApp" class="hidden">
+            <!-- Header -->
+            <div class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-4 sticky top-0 z-50">
+                <div class="flex items-center justify-between">
+                    <h1 class="text-lg font-bold">
+                        <i class="fas fa-graduation-cap mr-2"></i>
+                        <span id="appTitle">Kelas Pak Mahfud</span>
+                    </h1>
+                    <div class="flex items-center space-x-3">
+                        <div class="text-right">
+                            <div id="currentUser" class="text-sm font-medium"></div>
+                            <div id="userRole" class="text-xs opacity-75"></div>
+                        </div>
+                        <button onclick="logout()" class="text-white hover:text-gray-200 p-2">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Teacher Interface -->
+            <div id="teacherInterface" class="hidden p-4 pb-20">
+                <!-- Assignments List for Teacher -->
+                <div class="bg-white rounded-lg shadow-md p-4">
+                    <h2 class="text-lg font-bold text-gray-800 mb-4">
+                        <i class="fas fa-list text-blue-500 mr-2"></i>
+                        Daftar Tugas
+                    </h2>
+                    <div id="teacherAssignments" class="space-y-3">
+                        <!-- Dynamic content will be inserted here -->
+                    </div>
+                </div>
+
+                <!-- Floating Add Button -->
+                <button onclick="openCreateAssignmentModal()" class="fixed bottom-6 right-6 bg-gradient-to-r from-green-500 to-green-600 text-white w-14 h-14 rounded-full shadow-lg hover:from-green-600 hover:to-green-700 transition-all duration-200 flex items-center justify-center z-40">
+                    <i class="fas fa-plus text-xl"></i>
+                </button>
+            </div>
+
+            <!-- Student Interface -->
+            <div id="studentInterface" class="hidden p-4">
+                <!-- Student Info -->
+                <div class="bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg p-4 mb-4">
+                    <div class="flex items-center">
+                        <div class="bg-white bg-opacity-20 rounded-full p-3 mr-3">
+                            <i class="fas fa-user-graduate text-xl"></i>
+                        </div>
+                        <div>
+                            <h3 id="studentName" class="font-bold"></h3>
+                            <p id="studentInfo" class="text-sm opacity-90"></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Available Assignments for Students -->
+                <div class="bg-white rounded-lg shadow-md p-4">
+                    <h2 class="text-lg font-bold text-gray-800 mb-4">
+                        <i class="fas fa-tasks text-orange-500 mr-2"></i>
+                        Tugas Tersedia
+                    </h2>
+                    <div id="studentAssignments" class="space-y-3">
+                        <!-- Dynamic content will be inserted here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Create Assignment Modal -->
+        <div id="createAssignmentModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+            <div class="flex items-center justify-center min-h-screen p-4">
+                <div class="bg-white rounded-lg max-w-md w-full max-h-screen overflow-y-auto">
+                    <div class="p-4 border-b border-gray-200">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-lg font-bold text-gray-800">
+                                <i class="fas fa-plus-circle text-green-500 mr-2"></i>
+                                Buat Tugas Baru
+                            </h3>
+                            <button onclick="closeCreateAssignmentModal()" class="text-gray-500 hover:text-gray-700">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <form onsubmit="createAssignment(event)" class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Judul Tugas</label>
+                                <input type="text" id="assignmentTitle" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Masukkan judul tugas">
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Mata Pelajaran</label>
+                                    <select id="subject" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                        <option value="">Pilih Mapel</option>
+                                        <option value="Al-Quran Hadits">Al-Quran Hadits</option>
+                                        <option value="Akidah Akhlak">Akidah Akhlak</option>
+                                        <option value="Fikih">Fikih</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Kelas</label>
+                                    <select id="assignmentClass" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                        <option value="">Pilih Kelas</option>
+                                        <option value="4A">4A</option>
+                                        <option value="4B">4B</option>
+                                        <option value="5A">5A</option>
+                                        <option value="5B">5B</option>
+                                        <option value="6A">6A</option>
+                                        <option value="6B">6B</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Materi</label>
+                                <input type="text" id="assignmentMaterial" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Contoh: Surah Al-Fatihah, Wudhu, dll">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Deskripsi</label>
+                                <textarea id="assignmentDesc" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent h-20" placeholder="Jelaskan detail tugas"></textarea>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Lampiran (Opsional)</label>
+                                <div class="space-y-3">
+                                    <!-- Attachment Type Selector -->
+                                    <div class="flex space-x-2">
+                                        <button type="button" onclick="setAttachmentType('file')" id="fileTypeBtn" class="flex-1 bg-blue-500 text-white py-2 px-3 rounded-lg text-sm hover:bg-blue-600 transition-colors">
+                                            <i class="fas fa-file mr-1"></i>File
+                                        </button>
+                                        <button type="button" onclick="setAttachmentType('youtube')" id="youtubeTypeBtn" class="flex-1 bg-gray-300 text-gray-700 py-2 px-3 rounded-lg text-sm hover:bg-gray-400 transition-colors">
+                                            <i class="fab fa-youtube mr-1"></i>YouTube
+                                        </button>
+                                        <button type="button" onclick="setAttachmentType('link')" id="linkTypeBtn" class="flex-1 bg-gray-300 text-gray-700 py-2 px-3 rounded-lg text-sm hover:bg-gray-400 transition-colors">
+                                            <i class="fas fa-link mr-1"></i>Link
+                                        </button>
+                                    </div>
+                                    
+                                    <!-- File Upload -->
+                                    <div id="fileAttachment" class="attachment-input">
+                                        <input type="file" id="assignmentFile" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" accept=".pdf,.doc,.docx,.jpg,.png,.ppt,.pptx,.mp4,.mp3">
+                                        <p class="text-xs text-gray-500 mt-1">Format: PDF, DOC, DOCX, JPG, PNG, PPT, PPTX, MP4, MP3</p>
+                                    </div>
+                                    
+                                    <!-- YouTube URL -->
+                                    <div id="youtubeAttachment" class="attachment-input hidden">
+                                        <input type="url" id="youtubeUrl" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="https://www.youtube.com/watch?v=...">
+                                        <p class="text-xs text-gray-500 mt-1">Masukkan URL video YouTube</p>
+                                    </div>
+                                    
+                                    <!-- Link URL -->
+                                    <div id="linkAttachment" class="attachment-input hidden">
+                                        <input type="url" id="materialUrl" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="https://example.com/materi">
+                                        <input type="text" id="linkTitle" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent mt-2" placeholder="Judul link (opsional)">
+                                        <p class="text-xs text-gray-500 mt-1">Masukkan URL materi pembelajaran</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Rubrik Penilaian Sederhana -->
+                            <div class="border-t pt-4">
+                                <h4 class="text-md font-semibold text-gray-800 mb-3">
+                                    <i class="fas fa-clipboard-check text-blue-500 mr-2"></i>
+                                    Rubrik Penilaian (Skala 1-4)
+                                </h4>
+                                
+                                <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3">
+                                    <div class="text-xs text-blue-700">
+                                        <i class="fas fa-info-circle mr-1"></i>
+                                        <strong>Sistem Otomatis:</strong> Cukup masukkan nama kriteria (contoh: Adab, Fasohah, Kelancaran). 
+                                        Sistem otomatis menggunakan skala 1-4 dengan deskripsi standar.
+                                    </div>
+                                </div>
+                                
+                                <div id="rubricContainer" class="space-y-2">
+                                    <div class="rubric-item flex items-center space-x-2">
+                                        <input type="text" placeholder="Contoh: Adab" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm" name="rubricCriteria[]">
+                                        <button type="button" onclick="removeRubricItem(this)" class="text-red-500 hover:text-red-700 p-2">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex space-x-2 mt-3">
+                                    <button type="button" onclick="addSimpleRubricItem()" class="bg-blue-500 text-white px-3 py-2 rounded-lg text-sm hover:bg-blue-600 transition-colors">
+                                        <i class="fas fa-plus mr-1"></i>Tambah Kriteria
+                                    </button>
+                                </div>
+                                
+                                <div class="mt-3 p-3 bg-gray-50 rounded-lg">
+                                    <div class="text-xs text-gray-600 mb-2">
+                                        <strong>Skala Penilaian Otomatis:</strong>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-2 text-xs">
+                                        <div class="flex items-center space-x-1">
+                                            <span class="w-4 h-4 bg-red-500 rounded text-white text-center text-xs leading-4">1</span>
+                                            <span class="text-red-600 font-medium">Kurang</span>
+                                        </div>
+                                        <div class="flex items-center space-x-1">
+                                            <span class="w-4 h-4 bg-yellow-500 rounded text-white text-center text-xs leading-4">2</span>
+                                            <span class="text-yellow-600 font-medium">Cukup</span>
+                                        </div>
+                                        <div class="flex items-center space-x-1">
+                                            <span class="w-4 h-4 bg-blue-500 rounded text-white text-center text-xs leading-4">3</span>
+                                            <span class="text-blue-600 font-medium">Baik</span>
+                                        </div>
+                                        <div class="flex items-center space-x-1">
+                                            <span class="w-4 h-4 bg-green-500 rounded text-white text-center text-xs leading-4">4</span>
+                                            <span class="text-green-600 font-medium">Sangat Baik</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Deadline</label>
+                                <input type="datetime-local" id="deadline" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            </div>
+                            
+                            <div class="flex space-x-3 pt-4">
+                                <button type="button" onclick="closeCreateAssignmentModal()" class="flex-1 bg-gray-500 text-white py-2 px-4 rounded-lg font-medium hover:bg-gray-600 transition-all duration-200">
+                                    <i class="fas fa-times mr-2"></i>
+                                    Batal
+                                </button>
+                                <button type="submit" class="flex-1 bg-gradient-to-r from-green-500 to-green-600 text-white py-2 px-4 rounded-lg font-medium hover:from-green-600 hover:to-green-700 transition-all duration-200">
+                                    <i class="fas fa-paper-plane mr-2"></i>
+                                    Buat Tugas
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Assignment Detail Modal -->
+        <div id="assignmentModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+            <div class="flex items-center justify-center min-h-screen p-4">
+                <div class="bg-white rounded-lg max-w-md w-full max-h-screen overflow-y-auto">
+                    <div class="p-4 border-b border-gray-200">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-lg font-bold text-gray-800">Detail Tugas</h3>
+                            <button onclick="closeModal()" class="text-gray-500 hover:text-gray-700">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="modalContent" class="p-4">
+                        <!-- Dynamic content -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let assignments = [];
+        let students = {};
+        let currentUser = null;
+        let userRole = null;
+        let currentAttachmentType = 'file';
+        let isLoading = false;
+
+        // === GOOGLE APPS SCRIPT CONFIGURATION ===
+        // PENTING: Ganti URL ini dengan URL Google Apps Script Web App Anda!
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwSgGq1d1Sbm5PkT2h-yhE4Smvo9SjaWh983k4NH6XHqQ-sZ4zG1mVQRrTP_0OTJG6dmw/exec';
+        
+        // Set ke false untuk menggunakan database Google Apps Script
+        const USE_DEMO_MODE = false; // Menggunakan localStorage untuk demo yang persisten
+
+        // === GOOGLE APPS SCRIPT API FUNCTIONS ===
+        async function apiCall(functionName, ...args) {
+            if (isLoading) return null;
+            
+            try {
+                isLoading = true;
+                showLoading(true);
+                
+                console.log('API Call:', functionName, args);
+                
+                // Use localStorage for persistent demo data
+                if (USE_DEMO_MODE) {
+                    console.log('Using demo mode with localStorage persistence');
+                    return await simulateGoogleScriptCall(functionName, ...args);
+                }
+                
+                // Check if google.script.run is available (running in Google Apps Script environment)
+                if (typeof google !== 'undefined' && google.script && google.script.run) {
+                    return new Promise((resolve, reject) => {
+                        google.script.run
+                            .withSuccessHandler(resolve)
+                            .withFailureHandler(reject)
+                            [functionName](...args);
+                    });
+                } else if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL !== 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec') {
+                    // Use fetch API to call Google Apps Script Web App
+                    const response = await fetch(GOOGLE_SCRIPT_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            function: functionName,
+                            parameters: args
+                        })
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    
+                    return await response.json();
+                } else {
+                    // Fallback for testing/demo - simulate database responses
+                    console.warn('Google Apps Script environment not detected. Using demo data with localStorage.');
+                    return await simulateGoogleScriptCall(functionName, ...args);
+                }
+                
+            } catch (error) {
+                console.error('API Error:', error);
+                
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Database Connection Error',
+                    html: `
+                        <div class="text-left">
+                            <p><strong>Error:</strong> ${error.message}</p>
+                            <p><strong>Function:</strong> ${functionName}</p>
+                            <hr class="my-2">
+                            <p class="text-sm text-gray-600">
+                                <strong>Solusi:</strong><br>
+                                1. Pastikan URL Google Apps Script sudah benar<br>
+                                2. Deploy ulang sebagai Web App<br>
+                                3. Set permission "Anyone" untuk akses<br>
+                                4. Atau gunakan mode demo untuk testing
+                            </p>
+                        </div>
+                    `,
+                    confirmButtonColor: '#EF4444'
+                });
+                return null;
+            } finally {
+                isLoading = false;
+                showLoading(false);
+            }
+        }
+
+        // Simulate Google Apps Script calls with localStorage persistence
+        async function simulateGoogleScriptCall(functionName, ...args) {
+            // Simulate network delay
+            await new Promise(resolve => setTimeout(resolve, 300));
+            
+            // Initialize localStorage data if not exists
+            if (!localStorage.getItem('kelasAssignments')) {
+                // Create sample assignments for demo
+                const sampleAssignments = [
+                    {
+                        id: 1001,
+                        title: "Hafalan Surah Al-Fatihah",
+                        subject: "Al-Quran Hadits",
+                        class: "4A",
+                        material: "Surah Al-Fatihah",
+                        description: "Hafalkan Surah Al-Fatihah dengan tartil dan makharijul huruf yang benar. Rekam video hafalan dan upload sebagai tugas.",
+                        deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days from now
+                        attachment: {
+                            type: 'youtube',
+                            url: 'https://www.youtube.com/watch?v=pZd3BXBGhyM',
+                            title: 'Panduan Bacaan Surah Al-Fatihah'
+                        },
+                        rubric: [
+                            {
+                                criteria: 'Adab',
+                                scale: {
+                                    1: { label: 'Kurang', description: 'Adab masih kurang dan perlu banyak perbaikan' },
+                                    2: { label: 'Cukup', description: 'Adab cukup baik namun masih ada yang perlu diperbaiki' },
+                                    3: { label: 'Baik', description: 'Adab sudah baik dan sesuai harapan' },
+                                    4: { label: 'Sangat Baik', description: 'Adab sangat baik dan melampaui harapan' }
+                                }
+                            },
+                            {
+                                criteria: 'Fasohah',
+                                scale: {
+                                    1: { label: 'Kurang', description: 'Fasohah masih kurang dan perlu banyak perbaikan' },
+                                    2: { label: 'Cukup', description: 'Fasohah cukup baik namun masih ada yang perlu diperbaiki' },
+                                    3: { label: 'Baik', description: 'Fasohah sudah baik dan sesuai harapan' },
+                                    4: { label: 'Sangat Baik', description: 'Fasohah sangat baik dan melampaui harapan' }
+                                }
+                            },
+                            {
+                                criteria: 'Kelancaran',
+                                scale: {
+                                    1: { label: 'Kurang', description: 'Kelancaran masih kurang dan perlu banyak perbaikan' },
+                                    2: { label: 'Cukup', description: 'Kelancaran cukup baik namun masih ada yang perlu diperbaiki' },
+                                    3: { label: 'Baik', description: 'Kelancaran sudah baik dan sesuai harapan' },
+                                    4: { label: 'Sangat Baik', description: 'Kelancaran sangat baik dan melampaui harapan' }
+                                }
+                            }
+                        ],
+                        createdBy: 'Pak Mahfud',
+                        createdAt: new Date().toISOString(),
+                        submissions: []
+                    }
+                ];
+                localStorage.setItem('kelasAssignments', JSON.stringify(sampleAssignments));
+            }
+            
+            switch (functionName) {
+                case 'testConnection':
+                    return { success: true, message: 'Demo mode - localStorage ready' };
+                    
+                case 'authenticateUser':
+                    const credential = args[0];
+                    // Demo users dengan data lengkap
+                    const demoUsers = {
+                        'guruhebat': { type: 'teacher', name: 'Pak Mahfud', id: 'teacher1' },
+                        '12345': { type: 'student', nis: '12345', name: 'Ahmad Fauzi', class: '4A' },
+                        '67890': { type: 'student', nis: '67890', name: 'Siti Aminah', class: '4A' },
+                        '11111': { type: 'student', nis: '11111', name: 'Muhammad Rizki', class: '5B' },
+                        '22222': { type: 'student', nis: '22222', name: 'Fatimah Az-Zahra', class: '5A' },
+                        '33333': { type: 'student', nis: '33333', name: 'Ali bin Abi Thalib', class: '6A' }
+                    };
+                    
+                    if (demoUsers[credential]) {
+                        return { success: true, user: demoUsers[credential] };
+                    } else {
+                        return { success: false, message: 'NIS atau password tidak valid' };
+                    }
+                    
+                case 'getAssignments':
+                    const storedAssignments = JSON.parse(localStorage.getItem('kelasAssignments') || '[]');
+                    return { success: true, assignments: storedAssignments };
+                    
+                case 'saveAssignment':
+                    const newAssignment = args[0];
+                    newAssignment.id = Date.now();
+                    newAssignment.submissions = [];
+                    newAssignment.createdAt = new Date().toISOString();
+                    
+                    const currentAssignments = JSON.parse(localStorage.getItem('kelasAssignments') || '[]');
+                    currentAssignments.push(newAssignment);
+                    localStorage.setItem('kelasAssignments', JSON.stringify(currentAssignments));
+                    
+                    console.log('Assignment saved:', newAssignment.title);
+                    return { success: true, assignment: newAssignment };
+                    
+                case 'submitAssignment':
+                    const [assignmentId, studentData, fileData] = args;
+                    const assignments = JSON.parse(localStorage.getItem('kelasAssignments') || '[]');
+                    const assignment = assignments.find(a => a.id === assignmentId);
+                    
+                    if (assignment) {
+                        // Check if student already submitted
+                        const existingSubmission = assignment.submissions.find(s => s.studentNIS === studentData.studentNIS);
+                        if (existingSubmission) {
+                            return { success: false, message: 'Tugas sudah pernah dikumpulkan' };
+                        }
+                        
+                        const submission = {
+                            ...studentData,
+                            fileUrl: fileData ? `data:${fileData.mimeType};base64,${fileData.content}` : '#demo-file-url',
+                            fileData: fileData,
+                            submittedAt: new Date().toISOString(),
+                            id: Date.now()
+                        };
+                        assignment.submissions.push(submission);
+                        localStorage.setItem('kelasAssignments', JSON.stringify(assignments));
+                        
+                        console.log('Submission saved for:', studentData.studentName);
+                        return { success: true, submission: submission };
+                    }
+                    return { success: false, message: 'Tugas tidak ditemukan' };
+                    
+                case 'gradeSubmission':
+                    const [gradeAssignmentId, studentNIS, gradeData] = args;
+                    const gradeAssignments = JSON.parse(localStorage.getItem('kelasAssignments') || '[]');
+                    const gradeAssignment = gradeAssignments.find(a => a.id === gradeAssignmentId);
+                    
+                    if (gradeAssignment) {
+                        const submission = gradeAssignment.submissions.find(s => s.studentNIS === studentNIS);
+                        if (submission) {
+                            Object.assign(submission, gradeData);
+                            submission.gradedAt = new Date().toISOString();
+                            localStorage.setItem('kelasAssignments', JSON.stringify(gradeAssignments));
+                            
+                            console.log('Grade saved for:', submission.studentName, 'Score:', gradeData.score);
+                            return { success: true, submission: submission };
+                        }
+                    }
+                    return { success: false, message: 'Submission tidak ditemukan' };
+                    
+                default:
+                    return { success: false, message: 'Function not implemented in demo mode' };
+            }
+        }
+
+        function showLoading(show) {
+            const existingLoader = document.getElementById('loadingOverlay');
+            
+            if (show && !existingLoader) {
+                const loader = document.createElement('div');
+                loader.id = 'loadingOverlay';
+                loader.className = 'fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center';
+                loader.innerHTML = `
+                    <div class="bg-white rounded-lg p-6 flex items-center space-x-3">
+                        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                        <span class="text-gray-700">Memuat data...</span>
+                    </div>
+                `;
+                document.body.appendChild(loader);
+            } else if (!show && existingLoader) {
+                existingLoader.remove();
+            }
+        }
+
+        // === DATABASE FUNCTIONS ===
+        async function loadAssignments() {
+            const result = await apiCall('getAssignments');
+            if (result && result.success) {
+                assignments = result.assignments || [];
+                console.log('Assignments loaded:', assignments.length);
+                return true;
+            }
+            assignments = [];
+            return false;
+        }
+
+        async function loadStudents() {
+            const result = await apiCall('getStudents');
+            if (result && result.success) {
+                students = result.students || {};
+                console.log('Students loaded:', Object.keys(students).length);
+                return true;
+            }
+            students = {};
+            return false;
+        }
+
+        async function saveAssignment(assignmentData) {
+            const result = await apiCall('saveAssignment', assignmentData);
+            
+            if (result && result.success) {
+                await loadAssignments(); // Reload assignments
+                return result.assignment;
+            }
+            return null;
+        }
+
+        async function saveSubmission(assignmentId, studentData, fileData) {
+            const result = await apiCall('submitAssignment', assignmentId, studentData, fileData);
+            
+            if (result && result.success) {
+                await loadAssignments(); // Reload assignments
+                return result.submission;
+            }
+            return null;
+        }
+
+        async function saveGrade(assignmentId, studentNIS, gradeData) {
+            const result = await apiCall('gradeSubmission', assignmentId, studentNIS, gradeData);
+            
+            if (result && result.success) {
+                await loadAssignments(); // Reload assignments
+                return true;
+            }
+            return false;
+        }
+
+        // === FILE HANDLING ===
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => {
+                    const base64 = reader.result.split(',')[1];
+                    resolve({
+                        name: file.name,
+                        content: base64,
+                        mimeType: file.type,
+                        size: file.size
+                    });
+                };
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        // === INITIALIZATION ===
+        async function initializeApp() {
+            console.log('Initializing app...');
+            
+            // Test database connection
+            try {
+                const testResult = await apiCall('testConnection');
+                if (testResult && testResult.success) {
+                    console.log('Database connection successful:', testResult.message);
+                } else {
+                    console.warn('Database connection failed');
+                }
+            } catch (error) {
+                console.error('Database connection error:', error);
+            }
+            
+            console.log('App initialized');
+            return true;
+        }
+
+        // Handle login
+        async function handleLogin(event) {
+            event.preventDefault();
+            
+            const input = document.getElementById('loginInput').value.trim();
+            
+            if (!input) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Input Kosong',
+                    text: 'Masukkan NIS atau password guru',
+                    confirmButtonColor: '#F59E0B'
+                });
+                return;
+            }
+            
+            // Show loading
+            const loginButton = event.target.querySelector('button[type="submit"]');
+            const originalText = loginButton.innerHTML;
+            loginButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Memuat...';
+            loginButton.disabled = true;
+            
+            try {
+                // Call database login API
+                const loginResult = await apiCall('authenticateUser', input);
+                
+                if (loginResult && loginResult.success) {
+                    const user = loginResult.user;
+                    
+                    if (user.type === 'teacher') {
+                        currentUser = user.name;
+                        userRole = "teacher";
+                    } else if (user.type === 'student') {
+                        currentUser = user;
+                        userRole = "student";
+                    }
+                    
+                    await showMainApp();
+                    
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Login Berhasil',
+                        text: `Selamat datang, ${user.type === 'teacher' ? user.name : user.name}!`,
+                        confirmButtonColor: '#10B981',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Login Gagal',
+                        text: 'NIS atau password tidak valid',
+                        confirmButtonColor: '#EF4444'
+                    });
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Terjadi kesalahan saat login. Periksa koneksi database.',
+                    confirmButtonColor: '#EF4444'
+                });
+            } finally {
+                // Restore button
+                loginButton.innerHTML = originalText;
+                loginButton.disabled = false;
+            }
+        }
+
+        // Show main application
+        async function showMainApp() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('mainApp').classList.remove('hidden');
+            
+            // Load data from database
+            await loadAssignments();
+            await loadStudents();
+            
+            if (userRole === 'teacher') {
+                document.getElementById('currentUser').textContent = currentUser;
+                document.getElementById('userRole').textContent = 'Guru';
+                document.getElementById('appTitle').textContent = 'Kelas Pak Mahfud - Panel Guru';
+                document.getElementById('teacherInterface').classList.remove('hidden');
+                document.getElementById('studentInterface').classList.add('hidden');
+                renderTeacherAssignments();
+            } else {
+                document.getElementById('currentUser').textContent = currentUser.name;
+                document.getElementById('userRole').textContent = `Siswa - Kelas ${currentUser.class}`;
+                document.getElementById('appTitle').textContent = 'Kelas Pak Mahfud - Portal Siswa';
+                document.getElementById('studentName').textContent = currentUser.name;
+                document.getElementById('studentInfo').textContent = `Kelas ${currentUser.class} - NIS: ${currentUser.nis}`;
+                document.getElementById('studentInterface').classList.remove('hidden');
+                document.getElementById('teacherInterface').classList.add('hidden');
+                renderStudentAssignments();
+            }
+            
+            // Set minimum date to today for deadline
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            const deadlineInput = document.getElementById('deadline');
+            if (deadlineInput) {
+                deadlineInput.min = now.toISOString().slice(0, 16);
+            }
+        }
+
+        // Get current student NIS
+        function getCurrentStudentNIS() {
+            return currentUser ? currentUser.nis : null;
+        }
+
+        // Set attachment type
+        function setAttachmentType(type) {
+            currentAttachmentType = type;
+            
+            // Update button styles
+            document.getElementById('fileTypeBtn').className = 'flex-1 bg-gray-300 text-gray-700 py-2 px-3 rounded-lg text-sm hover:bg-gray-400 transition-colors';
+            document.getElementById('youtubeTypeBtn').className = 'flex-1 bg-gray-300 text-gray-700 py-2 px-3 rounded-lg text-sm hover:bg-gray-400 transition-colors';
+            document.getElementById('linkTypeBtn').className = 'flex-1 bg-gray-300 text-gray-700 py-2 px-3 rounded-lg text-sm hover:bg-gray-400 transition-colors';
+            
+            document.getElementById(type + 'TypeBtn').className = 'flex-1 bg-blue-500 text-white py-2 px-3 rounded-lg text-sm hover:bg-blue-600 transition-colors';
+            
+            // Show/hide attachment inputs
+            document.querySelectorAll('.attachment-input').forEach(input => {
+                input.classList.add('hidden');
+            });
+            
+            document.getElementById(type + 'Attachment').classList.remove('hidden');
+        }
+
+        // Add simple rubric item (new system)
+        function addSimpleRubricItem() {
+            const container = document.getElementById('rubricContainer');
+            const newItem = document.createElement('div');
+            newItem.className = 'rubric-item flex items-center space-x-2';
+            newItem.innerHTML = `
+                <input type="text" placeholder="Contoh: Fasohah" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm" name="rubricCriteria[]">
+                <button type="button" onclick="removeRubricItem(this)" class="text-red-500 hover:text-red-700 p-2">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            container.appendChild(newItem);
+        }
+
+        // Remove specific rubric item
+        function removeRubricItem(button) {
+            const container = document.getElementById('rubricContainer');
+            const items = container.querySelectorAll('.rubric-item');
+            if (items.length > 1) {
+                button.parentElement.remove();
+            }
+        }
+
+        // Open create assignment modal
+        function openCreateAssignmentModal() {
+            document.getElementById('createAssignmentModal').classList.remove('hidden');
+            
+            // Set minimum datetime to current time
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            document.getElementById('deadline').min = now.toISOString().slice(0, 16);
+        }
+
+        // Close create assignment modal
+        function closeCreateAssignmentModal() {
+            document.getElementById('createAssignmentModal').classList.add('hidden');
+            
+            // Reset form
+            const form = document.querySelector('#createAssignmentModal form');
+            form.reset();
+            
+            // Reset attachment type
+            setAttachmentType('file');
+        }
+
+        // Extract YouTube video ID and title
+        function extractYouTubeTitle(url) {
+            const videoId = extractYouTubeVideoId(url);
+            return videoId ? `Video YouTube: ${videoId}` : 'Video YouTube';
+        }
+
+        function extractYouTubeVideoId(url) {
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
+        }
+
+        // Generate attachment preview HTML
+        function generateAttachmentPreview(attachment) {
+            if (!attachment) return '';
+            
+            switch (attachment.type) {
+                case 'youtube':
+                    const videoId = extractYouTubeVideoId(attachment.url);
+                    return `
+                        <div class="mt-3 border border-gray-200 rounded-lg overflow-hidden">
+                            <div class="bg-gray-50 px-3 py-2 border-b border-gray-200">
+                                <div class="flex items-center text-sm text-gray-700">
+                                    <i class="fab fa-youtube text-red-500 mr-2"></i>
+                                    <span class="font-medium">${attachment.title}</span>
+                                </div>
+                            </div>
+                            <div class="aspect-video">
+                                <iframe 
+                                    src="https://www.youtube.com/embed/${videoId}" 
+                                    frameborder="0" 
+                                    allowfullscreen
+                                    class="w-full h-full"
+                                ></iframe>
+                            </div>
+                        </div>
+                    `;
+                
+                case 'link':
+                    return `
+                        <div class="mt-3 border border-gray-200 rounded-lg p-3">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <i class="fas fa-link text-blue-500 mr-2"></i>
+                                    <div>
+                                        <div class="font-medium text-gray-800">${attachment.title}</div>
+                                        <div class="text-xs text-gray-500">${attachment.url}</div>
+                                    </div>
+                                </div>
+                                <button onclick="window.open('${attachment.url}', '_blank')" class="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600">
+                                    <i class="fas fa-external-link-alt mr-1"></i>Buka
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                
+                case 'file':
+                    const fileExtension = attachment.name ? attachment.name.split('.').pop().toLowerCase() : '';
+                    const fileUrl = attachment.url.startsWith('data:') ? attachment.url : `data:application/octet-stream;base64,${attachment.url}`;
+                    
+                    if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
+                        return `
+                            <div class="mt-3 border border-gray-200 rounded-lg overflow-hidden">
+                                <div class="bg-gray-50 px-3 py-2 border-b border-gray-200">
+                                    <div class="flex items-center text-sm text-gray-700">
+                                        <i class="fas fa-image text-green-500 mr-2"></i>
+                                        <span class="font-medium">${attachment.name}</span>
+                                    </div>
+                                </div>
+                                <div class="p-3">
+                                    <img src="${fileUrl}" alt="${attachment.name}" class="w-full h-auto rounded-lg">
+                                </div>
+                            </div>
+                        `;
+                    } else if (['mp4', 'webm', 'ogg'].includes(fileExtension)) {
+                        return `
+                            <div class="mt-3 border border-gray-200 rounded-lg overflow-hidden">
+                                <div class="bg-gray-50 px-3 py-2 border-b border-gray-200">
+                                    <div class="flex items-center text-sm text-gray-700">
+                                        <i class="fas fa-video text-purple-500 mr-2"></i>
+                                        <span class="font-medium">${attachment.name}</span>
+                                    </div>
+                                </div>
+                                <div class="p-3">
+                                    <video controls class="w-full h-auto rounded-lg">
+                                        <source src="${fileUrl}" type="video/${fileExtension}">
+                                        Browser Anda tidak mendukung video.
+                                    </video>
+                                </div>
+                            </div>
+                        `;
+                    } else if (['mp3', 'wav', 'ogg'].includes(fileExtension)) {
+                        return `
+                            <div class="mt-3 border border-gray-200 rounded-lg p-3">
+                                <div class="flex items-center mb-3">
+                                    <i class="fas fa-music text-orange-500 mr-2"></i>
+                                    <span class="font-medium text-gray-800">${attachment.name}</span>
+                                </div>
+                                <audio controls class="w-full">
+                                    <source src="${fileUrl}" type="audio/${fileExtension}">
+                                    Browser Anda tidak mendukung audio.
+                                </audio>
+                            </div>
+                        `;
+                    } else if (fileExtension === 'pdf') {
+                        return `
+                            <div class="mt-3 border border-gray-200 rounded-lg p-3">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center text-sm text-gray-700">
+                                        <i class="fas fa-file-pdf text-red-500 mr-2"></i>
+                                        <span class="font-medium">${attachment.name}</span>
+                                    </div>
+                                    <button onclick="downloadFile('${fileUrl}', '${attachment.name}')" class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600">
+                                        <i class="fas fa-download mr-1"></i>Download PDF
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        return `
+                            <div class="mt-3 border border-gray-200 rounded-lg p-3">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-file text-gray-500 mr-2"></i>
+                                        <div>
+                                            <div class="font-medium text-gray-800">${attachment.name}</div>
+                                            <div class="text-xs text-gray-500">${formatFileSize(attachment.size || 0)}</div>
+                                        </div>
+                                    </div>
+                                    <button onclick="downloadFile('${fileUrl}', '${attachment.name}')" class="bg-gray-500 text-white px-3 py-1 rounded text-sm hover:bg-gray-600">
+                                        <i class="fas fa-download mr-1"></i>Download
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    }
+                
+                default:
+                    return '';
+            }
+        }
+
+        // Format file size
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Download file
+        function downloadFile(url, filename) {
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        // Get attachment icon based on type
+        function getAttachmentIcon(type) {
+            const icons = {
+                'youtube': 'play-circle',
+                'link': 'link',
+                'file': 'paperclip'
+            };
+            return icons[type] || 'paperclip';
+        }
+
+        // Create new assignment (teacher only)
+        async function createAssignment(event) {
+            event.preventDefault();
+            
+            const title = document.getElementById('assignmentTitle').value;
+            const subject = document.getElementById('subject').value;
+            const assignmentClass = document.getElementById('assignmentClass').value;
+            const material = document.getElementById('assignmentMaterial').value;
+            const description = document.getElementById('assignmentDesc').value;
+            const deadline = document.getElementById('deadline').value;
+            
+            // Handle different attachment types
+            let attachment = null;
+            if (currentAttachmentType === 'file') {
+                const file = document.getElementById('assignmentFile').files[0];
+                if (file) {
+                    // Convert file to base64 for local storage
+                    const fileData = await fileToBase64(file);
+                    attachment = {
+                        type: 'file',
+                        name: file.name,
+                        size: file.size,
+                        url: `data:${fileData.mimeType};base64,${fileData.content}`,
+                        title: file.name
+                    };
+                }
+            } else if (currentAttachmentType === 'youtube') {
+                const youtubeUrl = document.getElementById('youtubeUrl').value;
+                if (youtubeUrl) {
+                    attachment = {
+                        type: 'youtube',
+                        url: youtubeUrl,
+                        title: extractYouTubeTitle(youtubeUrl)
+                    };
+                }
+            } else if (currentAttachmentType === 'link') {
+                const materialUrl = document.getElementById('materialUrl').value;
+                const linkTitle = document.getElementById('linkTitle').value;
+                if (materialUrl) {
+                    attachment = {
+                        type: 'link',
+                        url: materialUrl,
+                        title: linkTitle || 'Link Materi'
+                    };
+                }
+            }
+            
+            // Collect simple rubric data (only criteria names)
+            const rubricCriteria = Array.from(document.querySelectorAll('input[name="rubricCriteria[]"]'))
+                .map(input => input.value.trim())
+                .filter(val => val !== '');
+            
+            // Build simple rubric object with automatic 1-4 scale
+            const rubric = rubricCriteria.map(criteria => ({
+                criteria: criteria,
+                scale: {
+                    1: { label: 'Kurang', description: `${criteria} masih kurang dan perlu banyak perbaikan` },
+                    2: { label: 'Cukup', description: `${criteria} cukup baik namun masih ada yang perlu diperbaiki` },
+                    3: { label: 'Baik', description: `${criteria} sudah baik dan sesuai harapan` },
+                    4: { label: 'Sangat Baik', description: `${criteria} sangat baik dan melampaui harapan` }
+                }
+            }));
+            
+            const newAssignment = {
+                title,
+                subject,
+                class: assignmentClass,
+                material,
+                description,
+                deadline,
+                attachment: attachment,
+                rubric: rubric,
+                createdBy: currentUser,
+                createdAt: new Date().toISOString()
+            };
+            
+            // Save to database
+            const savedAssignment = await saveAssignment(newAssignment);
+            
+            if (savedAssignment) {
+                // Close modal
+                closeCreateAssignmentModal();
+                
+                // Show success message
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berhasil!',
+                    text: 'Tugas berhasil dibuat dan disimpan',
+                    confirmButtonColor: '#10B981'
+                });
+                
+                // Re-render assignments
+                renderTeacherAssignments();
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal!',
+                    text: 'Gagal menyimpan tugas',
+                    confirmButtonColor: '#EF4444'
+                });
+            }
+        }
+
+        // Render assignments for teacher view
+        function renderTeacherAssignments() {
+            const container = document.getElementById('teacherAssignments');
+            
+            if (assignments.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 text-gray-500">
+                        <i class="fas fa-clipboard-list text-4xl mb-2"></i>
+                        <p>Belum ada tugas yang dibuat</p>
+                        <p class="text-xs mt-2">Klik tombol + untuk membuat tugas baru</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = assignments.map(assignment => `
+                <div class="assignment-card border border-gray-200 rounded-lg p-4 hover:shadow-md">
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <h3 class="font-bold text-gray-800">${assignment.title}</h3>
+                            <div class="flex items-center space-x-2 mt-1">
+                                <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">${assignment.subject}</span>
+                                <span class="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded-full">Kelas ${assignment.class}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-2">
+                        <span class="text-xs font-medium text-gray-600">Materi: </span>
+                        <span class="text-xs text-gray-800">${assignment.material}</span>
+                    </div>
+                    
+                    <p class="text-gray-600 text-sm mb-3">${assignment.description}</p>
+                    
+                    ${assignment.attachment ? `
+                        <div class="flex items-center text-xs text-gray-500 mb-2">
+                            <i class="fas fa-${getAttachmentIcon(assignment.attachment.type)} mr-1"></i>
+                            <span>${assignment.attachment.title || assignment.attachment.name || 'Lampiran'}</span>
+                        </div>
+                    ` : ''}
+                    
+                    <div class="flex justify-between items-center text-xs text-gray-500 mb-3">
+                        <span><i class="fas fa-calendar mr-1"></i>Deadline: ${formatDateTime(assignment.deadline)}</span>
+                        <span><i class="fas fa-users mr-1"></i>${assignment.submissions.length} submission</span>
+                    </div>
+                    
+                    <div class="flex space-x-2">
+                        <button onclick="viewSubmissions(${assignment.id})" class="flex-1 bg-blue-500 text-white py-2 px-3 rounded text-sm hover:bg-blue-600 transition-colors">
+                            <i class="fas fa-eye mr-1"></i>Lihat Submission
+                        </button>
+                        <button onclick="gradeAssignment(${assignment.id})" class="flex-1 bg-green-500 text-white py-2 px-3 rounded text-sm hover:bg-green-600 transition-colors">
+                            <i class="fas fa-star mr-1"></i>Beri Nilai
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Render assignments for student view
+        function renderStudentAssignments() {
+            const container = document.getElementById('studentAssignments');
+            const currentNIS = getCurrentStudentNIS();
+            const currentStudentClass = currentUser.class;
+            
+            // Filter assignments for current student's class
+            const studentAssignments = assignments.filter(assignment => assignment.class === currentStudentClass);
+            
+            if (studentAssignments.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 text-gray-500">
+                        <i class="fas fa-clipboard-list text-4xl mb-2"></i>
+                        <p>Belum ada tugas untuk kelas ${currentStudentClass}</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = studentAssignments.map(assignment => {
+                const isSubmitted = assignment.submissions.some(sub => sub.studentNIS === currentNIS);
+                const submission = assignment.submissions.find(sub => sub.studentNIS === currentNIS);
+                
+                return `
+                    <div class="assignment-card border border-gray-200 rounded-lg p-4 hover:shadow-md">
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <h3 class="font-bold text-gray-800">${assignment.title}</h3>
+                                <span class="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded-full mt-1 inline-block">${assignment.subject}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-2">
+                            <span class="text-xs font-medium text-gray-600">Materi: </span>
+                            <span class="text-xs text-gray-800">${assignment.material}</span>
+                        </div>
+                        
+                        <p class="text-gray-600 text-sm mb-3">${assignment.description}</p>
+                        
+                        ${assignment.attachment ? `
+                            <div class="flex items-center text-xs text-gray-500 mb-2">
+                                <i class="fas fa-${getAttachmentIcon(assignment.attachment.type)} mr-1"></i>
+                                <span>Lampiran: ${assignment.attachment.title || assignment.attachment.name || 'Tersedia'}</span>
+                            </div>
+                        ` : ''}
+                        
+                        <div class="flex justify-between items-center text-xs text-gray-500 mb-3">
+                            <span><i class="fas fa-calendar mr-1"></i>Deadline: ${formatDateTime(assignment.deadline)}</span>
+                            <span class="flex items-center">
+                                ${isSubmitted ? 
+                                    (submission && submission.score ? 
+                                        `<i class="fas fa-star text-yellow-500 mr-1"></i>Sudah dinilai` :
+                                        `<i class="fas fa-check-circle text-green-500 mr-1"></i>Sudah dikumpul`
+                                    ) :
+                                    `<i class="fas fa-clock text-orange-500 mr-1"></i>Belum dikumpul`
+                                }
+                            </span>
+                        </div>
+                        
+                        ${isSubmitted && submission && submission.score ? `
+                            <div class="bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 rounded-lg p-3 mb-3">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-sm font-medium text-green-700">
+                                        <i class="fas fa-trophy mr-1"></i>Nilai Akhir:
+                                    </span>
+                                    <span class="text-2xl font-bold text-green-800">${submission.score}/100</span>
+                                </div>
+                                
+                                ${submission.rubricScores && submission.rubricScores.length > 0 ? `
+                                    <div class="mt-2 pt-2 border-t border-green-200">
+                                        <span class="text-xs font-medium text-green-700 block mb-1">Detail Penilaian:</span>
+                                        <div class="space-y-1">
+                                            ${submission.rubricScores.map(score => `
+                                                <div class="flex justify-between items-center text-xs">
+                                                    <span class="text-gray-700">${score.criteria}:</span>
+                                                    <div class="flex items-center space-x-1">
+                                                        ${[1, 2, 3, 4].map(star => `
+                                                            <i class="fas fa-star ${star <= score.score ? getStarColorClass(score.score) : 'text-gray-300'} text-xs"></i>
+                                                        `).join('')}
+                                                        <span class="font-medium ${getScoreColorClass(score.score)} ml-1">${getScoreLabel(score.score)}</span>
+                                                    </div>
+                                                </div>
+                                            `).join('')}
+                                        </div>
+                                        ${submission.totalScore && submission.maxScore ? `
+                                            <div class="mt-2 pt-2 border-t border-green-200">
+                                                <div class="flex justify-between items-center text-xs">
+                                                    <span class="text-gray-700 font-medium">Total Skor:</span>
+                                                    <span class="font-bold text-green-700">${submission.totalScore}/${submission.maxScore}</span>
+                                                </div>
+                                            </div>
+                                        ` : ''}
+                                        
+                                        <div class="mt-2 pt-2 border-t border-green-200">
+                                            <span class="text-xs font-medium text-green-700 block mb-1">
+                                                <i class="fas fa-comment-dots mr-1"></i>Ringkasan Penilaian:
+                                            </span>
+                                            <div class="bg-blue-50 border border-blue-200 rounded p-2">
+                                                <div class="text-xs text-blue-800 leading-relaxed">
+                                                    ${generateStudentFeedback(submission.rubricScores, currentUser.name)}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ` : ''}
+                                
+                                ${submission.autoFeedback || submission.comment ? `
+                                    <div class="mt-2 pt-2 border-t border-green-200">
+                                        <span class="text-xs font-medium text-green-700 block mb-1">
+                                            <i class="fas fa-file-alt mr-1"></i>Detail Lengkap:
+                                        </span>
+                                        <button onclick="viewSubmission(${assignment.id})" class="text-xs text-blue-600 hover:text-blue-800 underline">
+                                            Klik untuk melihat feedback lengkap dari guru
+                                        </button>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        ` : isSubmitted && submission && !submission.score ? `
+                            <div class="bg-yellow-50 border border-yellow-200 rounded p-2 mb-3">
+                                <div class="flex items-center text-yellow-700">
+                                    <i class="fas fa-hourglass-half mr-2"></i>
+                                    <span class="text-sm">Menunggu penilaian guru</span>
+                                </div>
+                            </div>
+                        ` : ''}
+                        
+                        <div class="flex space-x-2">
+                            <button onclick="viewAssignmentDetail(${assignment.id})" class="flex-1 bg-gray-500 text-white py-2 px-3 rounded text-sm hover:bg-gray-600 transition-colors">
+                                <i class="fas fa-info-circle mr-1"></i>Detail Tugas
+                            </button>
+                            ${!isSubmitted ? `
+                                <button onclick="submitAssignment(${assignment.id})" class="flex-1 bg-orange-500 text-white py-2 px-3 rounded text-sm hover:bg-orange-600 transition-colors">
+                                    <i class="fas fa-upload mr-1"></i>Kumpul Tugas
+                                </button>
+                            ` : `
+                                <button onclick="viewSubmission(${assignment.id})" class="flex-1 bg-blue-500 text-white py-2 px-3 rounded text-sm hover:bg-blue-600 transition-colors">
+                                    <i class="fas fa-eye mr-1"></i>${submission && submission.score ? 'Lihat Hasil' : 'Lihat Status'}
+                                </button>
+                            `}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Submit assignment (student)
+        async function submitAssignment(assignmentId) {
+            const result = await Swal.fire({
+                title: 'Kumpul Tugas',
+                html: `
+                    <div class="text-left">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Upload File Tugas</label>
+                        <input type="file" id="assignmentFile" class="w-full px-3 py-2 border border-gray-300 rounded-lg" accept=".pdf,.doc,.docx,.jpg,.png,.mp3,.mp4,.ppt,.pptx">
+                        <p class="text-xs text-gray-500 mt-1">Format: PDF, DOC, DOCX, JPG, PNG, MP3, MP4, PPT, PPTX (Max 25MB)</p>
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'Kumpul Tugas',
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#10B981',
+                preConfirm: () => {
+                    const file = document.getElementById('assignmentFile').files[0];
+                    if (!file) {
+                        Swal.showValidationMessage('Pilih file terlebih dahulu');
+                        return false;
+                    }
+                    if (file.size > 25 * 1024 * 1024) {
+                        Swal.showValidationMessage('File terlalu besar (max 25MB)');
+                        return false;
+                    }
+                    
+                    // Validate file type
+                    const allowedTypes = ['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png', 'mp3', 'mp4', 'ppt', 'pptx'];
+                    const fileExtension = file.name.split('.').pop().toLowerCase();
+                    if (!allowedTypes.includes(fileExtension)) {
+                        Swal.showValidationMessage('Format file tidak didukung');
+                        return false;
+                    }
+                    
+                    return file;
+                }
+            });
+
+            if (result.isConfirmed && result.value) {
+                const file = result.value;
+                
+                // Convert file to base64
+                const fileData = await fileToBase64(file);
+                
+                // Submit to database
+                const submissionData = {
+                    studentNIS: currentUser.nis,
+                    studentName: currentUser.name,
+                    fileName: file.name,
+                    submittedAt: new Date().toISOString()
+                };
+                
+                const submissionResult = await apiCall('submitAssignment', assignmentId, submissionData, fileData);
+                
+                if (submissionResult && submissionResult.success) {
+                    await loadAssignments(); // Reload data
+                    
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: 'Tugas berhasil dikumpulkan',
+                        confirmButtonColor: '#10B981'
+                    });
+                    
+                    renderStudentAssignments();
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal!',
+                        text: submissionResult?.message || 'Gagal mengirim tugas',
+                        confirmButtonColor: '#EF4444'
+                    });
+                }
+            }
+        }
+
+        // View submissions (teacher)
+        function viewSubmissions(assignmentId) {
+            const assignment = assignments.find(a => a.id === assignmentId);
+            
+            const modalContent = `
+                <h4 class="font-bold text-lg mb-4">${assignment.title} - Submissions</h4>
+                
+                ${assignment.attachment ? `
+                    <div class="mb-4 bg-gray-50 border border-gray-200 rounded-lg p-3">
+                        <h5 class="font-medium text-gray-800 mb-2">
+                            <i class="fas fa-${getAttachmentIcon(assignment.attachment.type)} mr-2"></i>
+                            Materi Pembelajaran
+                        </h5>
+                        ${generateAttachmentPreview(assignment.attachment)}
+                    </div>
+                ` : ''}
+                
+                ${assignment.submissions.length === 0 ? `
+                    <div class="text-center py-8 text-gray-500">
+                        <i class="fas fa-inbox text-4xl mb-2"></i>
+                        <p>Belum ada submission</p>
+                    </div>
+                ` : `
+                    <div class="space-y-3">
+                        ${assignment.submissions.map(sub => `
+                            <div class="border border-gray-200 rounded-lg p-3">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div>
+                                        <h5 class="font-medium">${sub.studentName}</h5>
+                                        <p class="text-xs text-gray-500">NIS: ${sub.studentNIS}</p>
+                                    </div>
+                                    ${sub.score ? `<span class="bg-green-100 text-green-800 px-2 py-1 rounded text-sm">${sub.score}/100</span>` : ''}
+                                </div>
+                                <p class="text-sm text-gray-600 mb-2">Dikumpul: ${formatDate(sub.submittedAt)}</p>
+                                <div class="flex space-x-2">
+                                    <button onclick="openFile('${sub.fileUrl}')" class="bg-blue-500 text-white px-3 py-1 rounded text-sm hover:bg-blue-600">
+                                        <i class="fas fa-external-link-alt mr-1"></i>Buka File
+                                    </button>
+                                    ${!sub.score ? `
+                                        <button onclick="gradeSubmission(${assignmentId}, '${sub.studentNIS}')" class="bg-green-500 text-white px-3 py-1 rounded text-sm hover:bg-green-600">
+                                            <i class="fas fa-star mr-1"></i>Beri Nilai
+                                        </button>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `}
+            `;
+            
+            document.getElementById('modalContent').innerHTML = modalContent;
+            document.getElementById('assignmentModal').classList.remove('hidden');
+        }
+
+        // Grade submission
+        async function gradeSubmission(assignmentId, studentNIS) {
+            closeModal();
+            
+            const assignment = assignments.find(a => a.id === assignmentId);
+            const submission = assignment.submissions.find(s => s.studentNIS === studentNIS);
+            
+            if (assignment.rubric && assignment.rubric.length > 0) {
+                // Show rubric-based grading
+                await showRubricGrading(assignment, submission);
+            } else {
+                // Show traditional grading
+                await showTraditionalGrading(assignment, submission);
+            }
+        }
+
+        // Show simple rubric-based grading interface (1-4 star scale)
+        async function showRubricGrading(assignment, submission) {
+            const rubricHTML = assignment.rubric.map((criterion, index) => `
+                <div class="border border-gray-200 rounded-lg p-3 mb-3">
+                    <div class="flex items-center justify-between">
+                        <h5 class="font-medium text-gray-800">${criterion.criteria}</h5>
+                        <div class="flex items-center space-x-1">
+                            ${[1, 2, 3, 4].map(score => `
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="rubric_${index}" value="${score}" class="hidden">
+                                    <i class="fas fa-star text-2xl star-rating transition-all duration-200 hover:scale-110" data-score="${score}" data-index="${index}"></i>
+                                </label>
+                            `).join('')}
+                        </div>
+                    </div>
+                    <div id="criterion_${index}_label" class="text-xs text-gray-500 mt-1 text-right opacity-0 transition-opacity duration-200"></div>
+                </div>
+            `).join('');
+
+            const result = await Swal.fire({
+                title: 'Penilaian Skala 1-4',
+                html: `
+                    <div class="text-left max-h-96 overflow-y-auto">
+                        <div class="mb-4 p-3 bg-blue-50 rounded-lg">
+                            <h4 class="font-medium text-blue-800 mb-1">Siswa: ${submission.studentName}</h4>
+                            <p class="text-sm text-blue-600">Tugas: ${assignment.title}</p>
+                        </div>
+                        
+                        ${rubricHTML}
+                        
+                        <div class="mt-4 p-3 bg-gray-50 rounded-lg">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Catatan Tambahan (Opsional)</label>
+                            <textarea id="additionalComment" class="w-full px-3 py-2 border border-gray-300 rounded-lg h-20" placeholder="Berikan feedback tambahan untuk siswa"></textarea>
+                        </div>
+                        
+                        <div id="calculatedScore" class="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg hidden">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="font-medium text-green-700">Total Skor:</span>
+                                <span id="totalScore" class="text-lg font-bold text-green-800"></span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="font-medium text-green-700">Nilai Akhir:</span>
+                                <span id="finalScore" class="text-2xl font-bold text-green-800"></span>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                width: '500px',
+                showCancelButton: true,
+                confirmButtonText: 'Simpan Nilai',
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#10B981',
+                preConfirm: () => {
+                    const scores = [];
+                    let allSelected = true;
+                    
+                    assignment.rubric.forEach((criterion, index) => {
+                        const selected = document.querySelector(`input[name="rubric_${index}"]:checked`);
+                        if (!selected) {
+                            allSelected = false;
+                            return;
+                        }
+                        
+                        const score = parseInt(selected.value);
+                        scores.push({
+                            criteria: criterion.criteria,
+                            score: score
+                        });
+                    });
+                    
+                    if (!allSelected) {
+                        Swal.showValidationMessage('Pilih penilaian untuk semua kriteria');
+                        return false;
+                    }
+                    
+                    const totalScore = scores.reduce((sum, s) => sum + s.score, 0);
+                    const maxScore = assignment.rubric.length * 4;
+                    const finalScore = Math.round((totalScore / maxScore) * 100);
+                    const additionalComment = document.getElementById('additionalComment').value;
+                    const autoFeedback = generateSimpleAutoFeedback(scores, assignment.rubric, totalScore, maxScore, finalScore, submission.studentName);
+                    
+                    return { 
+                        score: finalScore,
+                        rubricScores: scores, 
+                        totalScore,
+                        maxScore,
+                        comment: additionalComment, 
+                        autoFeedback,
+                        gradedBy: currentUser,
+                        gradedAt: new Date().toISOString()
+                    };
+                }
+            });
+
+            // Add event listeners and styling for star rating
+            setTimeout(() => {
+                // Initialize star colors
+                document.querySelectorAll('.star-rating').forEach(star => {
+                    star.classList.add('text-gray-300');
+                });
+
+                // Add click handlers for stars
+                document.querySelectorAll('.star-rating').forEach(star => {
+                    star.addEventListener('click', function() {
+                        const score = parseInt(this.dataset.score);
+                        const index = parseInt(this.dataset.index);
+                        const radio = this.parentElement.querySelector('input[type="radio"]');
+                        radio.checked = true;
+                        
+                        // Update star colors for this criterion
+                        const container = this.closest('.border.border-gray-200.rounded-lg');
+                        const stars = container.querySelectorAll('.star-rating');
+                        
+                        stars.forEach((s, i) => {
+                            s.classList.remove('text-red-500', 'text-yellow-500', 'text-blue-500', 'text-green-500', 'text-gray-300');
+                            if (i < score) {
+                                // Color based on the selected score level
+                                if (score === 1) s.classList.add('text-red-500');
+                                else if (score === 2) s.classList.add('text-yellow-500');
+                                else if (score === 3) s.classList.add('text-blue-500');
+                                else if (score === 4) s.classList.add('text-green-500');
+                            } else {
+                                s.classList.add('text-gray-300');
+                            }
+                        });
+                        
+                        // Show score label
+                        const label = document.getElementById(`criterion_${index}_label`);
+                        label.textContent = `${getScoreLabel(score)} (${score}/4)`;
+                        label.classList.remove('opacity-0');
+                        label.classList.add('opacity-100');
+                        
+                        updateSimpleCalculatedScore();
+                    });
+                    
+                    // Add hover effect
+                    star.addEventListener('mouseenter', function() {
+                        const score = parseInt(this.dataset.score);
+                        const container = this.closest('.border.border-gray-200.rounded-lg');
+                        const stars = container.querySelectorAll('.star-rating');
+                        
+                        stars.forEach((s, i) => {
+                            if (i < score) {
+                                s.classList.add('text-yellow-400');
+                            }
+                        });
+                    });
+                    
+                    star.addEventListener('mouseleave', function() {
+                        const container = this.closest('.border.border-gray-200.rounded-lg');
+                        const stars = container.querySelectorAll('.star-rating');
+                        const checkedRadio = container.querySelector('input[type="radio"]:checked');
+                        
+                        if (checkedRadio) {
+                            const checkedScore = parseInt(checkedRadio.value);
+                            stars.forEach((s, i) => {
+                                s.classList.remove('text-yellow-400');
+                                if (i < checkedScore) {
+                                    if (checkedScore === 1) s.classList.add('text-red-500');
+                                    else if (checkedScore === 2) s.classList.add('text-yellow-500');
+                                    else if (checkedScore === 3) s.classList.add('text-blue-500');
+                                    else if (checkedScore === 4) s.classList.add('text-green-500');
+                                }
+                            });
+                        } else {
+                            stars.forEach(s => {
+                                s.classList.remove('text-yellow-400');
+                            });
+                        }
+                    });
+                });
+            }, 100);
+
+            function updateSimpleCalculatedScore() {
+                const scores = [];
+                let allSelected = true;
+                
+                assignment.rubric.forEach((criterion, index) => {
+                    const selected = document.querySelector(`input[name="rubric_${index}"]:checked`);
+                    if (!selected) {
+                        allSelected = false;
+                        return;
+                    }
+                    
+                    scores.push(parseInt(selected.value));
+                });
+                
+                if (allSelected) {
+                    const totalScore = scores.reduce((sum, score) => sum + score, 0);
+                    const maxScore = assignment.rubric.length * 4;
+                    const finalScore = Math.round((totalScore / maxScore) * 100);
+                    
+                    document.getElementById('calculatedScore').classList.remove('hidden');
+                    document.getElementById('totalScore').textContent = `${totalScore}/${maxScore}`;
+                    document.getElementById('finalScore').textContent = finalScore + '%';
+                } else {
+                    document.getElementById('calculatedScore').classList.add('hidden');
+                }
+            }
+
+            if (result.isConfirmed && result.value) {
+                // Save grade to database
+                const gradeResult = await apiCall('gradeSubmission', assignment.id, submission.studentNIS, result.value);
+                
+                if (gradeResult && gradeResult.success) {
+                    await loadAssignments(); // Reload data
+                    
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: 'Nilai berhasil disimpan',
+                        confirmButtonColor: '#10B981'
+                    });
+                    
+                    renderTeacherAssignments();
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal!',
+                        text: gradeResult?.message || 'Gagal menyimpan nilai',
+                        confirmButtonColor: '#EF4444'
+                    });
+                }
+            }
+        }
+
+        // Show traditional grading interface
+        async function showTraditionalGrading(assignment, submission) {
+            const result = await Swal.fire({
+                title: 'Beri Nilai',
+                html: `
+                    <div class="text-left">
+                        <div class="mb-4 p-3 bg-blue-50 rounded-lg">
+                            <h4 class="font-medium text-blue-800 mb-1">Siswa: ${submission.studentName}</h4>
+                            <p class="text-sm text-blue-600">Tugas: ${assignment.title}</p>
+                        </div>
+                        
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Nilai (0-100)</label>
+                        <input type="number" id="gradeInput" min="0" max="100" class="w-full px-3 py-2 border border-gray-300 rounded-lg" placeholder="Masukkan nilai">
+                        <label class="block text-sm font-medium text-gray-700 mb-2 mt-3">Komentar (Opsional)</label>
+                        <textarea id="commentInput" class="w-full px-3 py-2 border border-gray-300 rounded-lg h-20" placeholder="Berikan feedback untuk siswa"></textarea>
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'Simpan Nilai',
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#10B981',
+                preConfirm: () => {
+                    const grade = document.getElementById('gradeInput').value;
+                    const comment = document.getElementById('commentInput').value;
+                    
+                    if (!grade || grade < 0 || grade > 100) {
+                        Swal.showValidationMessage('Masukkan nilai yang valid (0-100)');
+                        return false;
+                    }
+                    
+                    return { 
+                        score: parseInt(grade), 
+                        comment: comment,
+                        gradedBy: currentUser,
+                        gradedAt: new Date().toISOString()
+                    };
+                }
+            });
+
+            if (result.isConfirmed && result.value) {
+                // Save grade to database
+                const gradeResult = await apiCall('gradeSubmission', assignment.id, submission.studentNIS, result.value);
+                
+                if (gradeResult && gradeResult.success) {
+                    await loadAssignments(); // Reload data
+                    
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil!',
+                        text: 'Nilai berhasil disimpan',
+                        confirmButtonColor: '#10B981'
+                    });
+                    
+                    renderTeacherAssignments();
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Gagal!',
+                        text: gradeResult?.message || 'Gagal menyimpan nilai',
+                        confirmButtonColor: '#EF4444'
+                    });
+                }
+            }
+        }
+
+        // Helper functions for simple rubric grading (1-4 scale)
+        function getScoreColorClass(score) {
+            const colors = {
+                1: 'text-red-600',
+                2: 'text-yellow-600',
+                3: 'text-blue-600',
+                4: 'text-green-600'
+            };
+            return colors[score] || 'text-gray-600';
+        }
+
+        function getScoreBackgroundClass(score) {
+            const colors = {
+                1: 'bg-red-500',
+                2: 'bg-yellow-500',
+                3: 'bg-blue-500',
+                4: 'bg-green-500'
+            };
+            return colors[score] || 'bg-gray-500';
+        }
+
+        function getScoreLabel(score) {
+            const labels = {
+                1: 'Kurang',
+                2: 'Cukup',
+                3: 'Baik',
+                4: 'Sangat Baik'
+            };
+            return labels[score] || score;
+        }
+
+        function getStarColorClass(score) {
+            const colors = {
+                1: 'text-red-500',
+                2: 'text-yellow-500',
+                3: 'text-blue-500',
+                4: 'text-green-500'
+            };
+            return colors[score] || 'text-gray-500';
+        }
+
+        function generateStudentFeedback(rubricScores, studentName = null) {
+            // Group scores by rating level
+            const scoreGroups = {
+                4: [],
+                3: [],
+                2: [],
+                1: []
+            };
+            
+            rubricScores.forEach(score => {
+                scoreGroups[score.score].push(score.criteria);
+            });
+            
+            let feedback = "";
+            
+            // Add student name at the beginning if provided
+            const namePrefix = studentName ? `Ananda ${studentName} ` : "";
+            
+            // Generate feedback for each level (highest to lowest)
+            if (scoreGroups[4].length > 0) {
+                feedback += `${namePrefix}sangat baik pada aspek ${scoreGroups[4].join(', ').toLowerCase()}. `;
+            }
+            
+            if (scoreGroups[3].length > 0) {
+                const prefix = feedback ? "" : namePrefix;
+                feedback += `${prefix}${feedback ? "Baik" : "Baik"} pada aspek ${scoreGroups[3].join(', ').toLowerCase()}. `;
+            }
+            
+            if (scoreGroups[2].length > 0) {
+                const prefix = feedback ? "" : namePrefix;
+                feedback += `${prefix}${feedback ? "Cukup" : "Cukup"} pada aspek ${scoreGroups[2].join(', ').toLowerCase()}. `;
+            }
+            
+            if (scoreGroups[1].length > 0) {
+                const needsImprovement = scoreGroups[1].join(', ').toLowerCase();
+                feedback += `${needsImprovement} perlu ditingkatkan lagi. `;
+            }
+            
+            // Add motivational closing
+            const avgScore = rubricScores.reduce((sum, score) => sum + score.score, 0) / rubricScores.length;
+            
+            if (avgScore >= 3.5) {
+                feedback += "Terus pertahankan kualitas yang baik ini!";
+            } else if (avgScore >= 2.5) {
+                feedback += "Terus tingkatkan kualitas untuk hasil yang lebih optimal!";
+            } else {
+                feedback += "Semangat terus belajar dan berlatih untuk perbaikan yang lebih baik!";
+            }
+            
+            return feedback;
+        }
+
+        function generateSimpleAutoFeedback(scores, rubric, totalScore, maxScore, finalScore, studentName = null) {
+            let feedback = "Hasil Penilaian:\n\n";
+            
+            scores.forEach((score) => {
+                const criterion = rubric.find(r => r.criteria === score.criteria);
+                feedback += `${score.criteria}: ${getScoreLabel(score.score)} (${score.score}/4)\n`;
+                feedback += `- ${criterion.scale[score.score].description}\n\n`;
+            });
+            
+            feedback += `Total Skor: ${totalScore}/${maxScore} = ${finalScore}%\n\n`;
+            
+            // Generate personalized conclusion with student name
+            const personalizedConclusion = generateStudentFeedback(scores, studentName);
+            feedback += `Kesimpulan: ${personalizedConclusion}`;
+            
+            return feedback;
+        }
+
+        // Grade assignment (bulk)
+        function gradeAssignment(assignmentId) {
+            viewSubmissions(assignmentId);
+        }
+
+        // View assignment detail (student)
+        function viewAssignmentDetail(assignmentId) {
+            const assignment = assignments.find(a => a.id === assignmentId);
+            
+            const modalContent = `
+                <div class="max-h-96 overflow-y-auto">
+                    <h4 class="font-bold text-lg mb-4 sticky top-0 bg-white pb-2 border-b">
+                        <i class="fas fa-tasks text-blue-500 mr-2"></i>
+                        Detail Tugas
+                    </h4>
+                    
+                    <div class="space-y-4">
+                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                            <h5 class="font-bold text-blue-800 mb-3">${assignment.title}</h5>
+                            <div class="space-y-2 text-sm">
+                                <div class="flex items-center">
+                                    <i class="fas fa-book text-blue-600 mr-2 w-4"></i>
+                                    <span class="font-medium text-blue-700">Mata Pelajaran:</span>
+                                    <span class="ml-2 text-blue-800">${assignment.subject}</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fas fa-bookmark text-blue-600 mr-2 w-4"></i>
+                                    <span class="font-medium text-blue-700">Materi:</span>
+                                    <span class="ml-2 text-blue-800">${assignment.material}</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fas fa-users text-blue-600 mr-2 w-4"></i>
+                                    <span class="font-medium text-blue-700">Kelas:</span>
+                                    <span class="ml-2 text-blue-800">${assignment.class}</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fas fa-calendar text-blue-600 mr-2 w-4"></i>
+                                    <span class="font-medium text-blue-700">Deadline:</span>
+                                    <span class="ml-2 text-blue-800">${formatDateTime(assignment.deadline)}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                            <h5 class="font-medium text-gray-800 mb-2">
+                                <i class="fas fa-align-left mr-2"></i>
+                                Deskripsi Tugas
+                            </h5>
+                            <p class="text-gray-700 text-sm leading-relaxed">${assignment.description}</p>
+                        </div>
+                        
+                        ${assignment.attachment ? `
+                            <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                                <h5 class="font-medium text-green-800 mb-3">
+                                    <i class="fas fa-${getAttachmentIcon(assignment.attachment.type)} mr-2"></i>
+                                    Materi Pembelajaran
+                                </h5>
+                                ${generateAttachmentPreview(assignment.attachment)}
+                            </div>
+                        ` : ''}
+                        
+                        ${assignment.rubric && assignment.rubric.length > 0 ? `
+                            <div class="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                                <h5 class="font-medium text-purple-800 mb-3">
+                                    <i class="fas fa-clipboard-check mr-2"></i>
+                                    Kriteria Penilaian
+                                </h5>
+                                <div class="space-y-2">
+                                    ${assignment.rubric.map(criterion => `
+                                        <div class="flex items-center justify-between bg-white rounded-lg p-2 border border-purple-100">
+                                            <span class="text-sm font-medium text-purple-700">${criterion.criteria}</span>
+                                            <div class="flex items-center space-x-1">
+                                                ${[1, 2, 3, 4].map(star => `
+                                                    <i class="fas fa-star text-xs text-purple-300"></i>
+                                                `).join('')}
+                                                <span class="text-xs text-purple-600 ml-1">(1-4)</span>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                                <div class="mt-3 p-2 bg-white rounded border border-purple-100">
+                                    <div class="text-xs text-purple-600">
+                                        <strong>Skala Penilaian:</strong> 1=Kurang, 2=Cukup, 3=Baik, 4=Sangat Baik
+                                    </div>
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('modalContent').innerHTML = modalContent;
+            document.getElementById('assignmentModal').classList.remove('hidden');
+        }
+
+        // View submission (student)
+        function viewSubmission(assignmentId) {
+            const assignment = assignments.find(a => a.id === assignmentId);
+            const currentNIS = getCurrentStudentNIS();
+            const submission = assignment.submissions.find(s => s.studentNIS === currentNIS);
+            
+            const modalContent = `
+                <div class="max-h-96 overflow-y-auto">
+                    <h4 class="font-bold text-lg mb-4 sticky top-0 bg-white pb-2 border-b">
+                        <i class="fas fa-file-alt text-blue-500 mr-2"></i>
+                        Hasil Submission Saya
+                    </h4>
+                    
+                    <div class="space-y-4">
+                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                            <h5 class="font-medium text-blue-800 mb-2">Informasi Tugas</h5>
+                            <div class="space-y-1 text-sm">
+                                <div><span class="font-medium text-blue-700">Tugas:</span> ${assignment.title}</div>
+                                <div><span class="font-medium text-blue-700">Mata Pelajaran:</span> ${assignment.subject}</div>
+                                <div><span class="font-medium text-blue-700">Materi:</span> ${assignment.material}</div>
+                                <div><span class="font-medium text-blue-700">Dikumpul:</span> ${formatDate(submission.submittedAt)}</div>
+                            </div>
+                        </div>
+                        
+                        ${assignment.attachment ? `
+                            <div class="bg-gray-50 border border-gray-200 rounded-lg p-3">
+                                <h5 class="font-medium text-gray-800 mb-2">
+                                    <i class="fas fa-${getAttachmentIcon(assignment.attachment.type)} mr-2"></i>
+                                    Materi Pembelajaran
+                                </h5>
+                                ${generateAttachmentPreview(assignment.attachment)}
+                            </div>
+                        ` : ''}
+                        
+                        ${submission.score ? `
+                            <div class="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-4">
+                                <div class="flex items-center justify-between mb-3">
+                                    <h5 class="font-bold text-green-800 flex items-center">
+                                        <i class="fas fa-trophy text-yellow-500 mr-2"></i>
+                                        Nilai Akhir
+                                    </h5>
+                                    <div class="text-right">
+                                        <div class="text-3xl font-bold text-green-800">${submission.score}</div>
+                                        <div class="text-sm text-green-600">dari 100</div>
+                                    </div>
+                                </div>
+                                
+                                ${submission.rubricScores && submission.rubricScores.length > 0 ? `
+                                    <div class="mt-4 pt-3 border-t border-green-200">
+                                        <h6 class="font-medium text-green-800 mb-3 flex items-center">
+                                            <i class="fas fa-clipboard-check mr-2"></i>
+                                            Detail Penilaian per Kriteria
+                                        </h6>
+                                        <div class="space-y-3">
+                                            ${submission.rubricScores.map(score => {
+                                                const criterion = assignment.rubric.find(r => r.criteria === score.criteria);
+                                                return `
+                                                    <div class="bg-white border border-green-100 rounded-lg p-3">
+                                                        <div class="flex justify-between items-center mb-2">
+                                                            <span class="font-medium text-gray-800">${score.criteria}</span>
+                                                            <div class="flex items-center space-x-2">
+                                                                <div class="flex items-center space-x-1">
+                                                                    ${[1, 2, 3, 4].map(star => `
+                                                                        <i class="fas fa-star ${star <= score.score ? getStarColorClass(score.score) : 'text-gray-300'}"></i>
+                                                                    `).join('')}
+                                                                </div>
+                                                                <span class="font-bold ${getScoreColorClass(score.score)} text-sm">
+                                                                    ${getScoreLabel(score.score)}
+                                                                </span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="text-xs text-gray-600 bg-gray-50 rounded p-2">
+                                                            <i class="fas fa-comment mr-1"></i>
+                                                            ${criterion.scale[score.score].description}
+                                                        </div>
+                                                    </div>
+                                                `;
+                                            }).join('')}
+                                        </div>
+                                        
+                                        <div class="mt-4 pt-3 border-t border-green-200">
+                                            <h6 class="font-medium text-green-800 mb-2 flex items-center">
+                                                <i class="fas fa-lightbulb mr-2"></i>
+                                                Ringkasan Penilaian
+                                            </h6>
+                                            <div class="bg-gradient-to-r from-blue-50 to-green-50 border border-blue-200 rounded-lg p-3">
+                                                <div class="text-sm text-gray-700 leading-relaxed">
+                                                    ${generateStudentFeedback(submission.rubricScores, currentUser.name)}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ` : ''}
+                                
+                                ${submission.autoFeedback ? `
+                                    <div class="mt-4 pt-3 border-t border-green-200">
+                                        <h6 class="font-medium text-green-800 mb-2 flex items-center">
+                                            <i class="fas fa-robot mr-2"></i>
+                                            Feedback Otomatis Sistem
+                                        </h6>
+                                        <div class="bg-white border border-green-100 rounded-lg p-3">
+                                            <div class="text-sm text-gray-700 whitespace-pre-line leading-relaxed">${submission.autoFeedback}</div>
+                                        </div>
+                                    </div>
+                                ` : ''}
+                                
+                                ${submission.comment ? `
+                                    <div class="mt-4 pt-3 border-t border-green-200">
+                                        <h6 class="font-medium text-green-800 mb-2 flex items-center">
+                                            <i class="fas fa-user-tie mr-2"></i>
+                                            Catatan Tambahan dari Guru
+                                        </h6>
+                                        <div class="bg-white border border-green-100 rounded-lg p-3">
+                                            <div class="text-sm text-gray-700 italic">"${submission.comment}"</div>
+                                        </div>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        ` : `
+                            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                                <div class="flex items-center text-yellow-800">
+                                    <i class="fas fa-hourglass-half text-2xl mr-3"></i>
+                                    <div>
+                                        <h5 class="font-medium">Menunggu Penilaian</h5>
+                                        <p class="text-sm mt-1">Guru sedang menilai submission Anda. Harap bersabar.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        `}
+                        
+                        <div class="pt-3 border-t border-gray-200">
+                            <button onclick="openFile('${submission.fileUrl}')" class="w-full bg-blue-500 text-white py-3 px-4 rounded-lg hover:bg-blue-600 transition-colors flex items-center justify-center">
+                                <i class="fas fa-external-link-alt mr-2"></i>
+                                Lihat File Submission Saya
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('modalContent').innerHTML = modalContent;
+            document.getElementById('assignmentModal').classList.remove('hidden');
+        }
+
+        // Open file (local or external)
+        function openFile(url) {
+            if (url && url !== '#' && url !== '#demo-file-url') {
+                if (url.startsWith('data:')) {
+                    // For data URLs, create a temporary link and click it
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.target = '_blank';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                } else {
+                    window.open(url, '_blank');
+                }
+            } else {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'File Demo',
+                    text: 'Ini adalah file demo. Dalam implementasi nyata, file akan dibuka dari Google Drive.',
+                    confirmButtonText: 'OK',
+                    confirmButtonColor: '#3B82F6'
+                });
+            }
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('assignmentModal').classList.add('hidden');
+        }
+
+        // Logout
+        function logout() {
+            Swal.fire({
+                title: 'Logout',
+                text: 'Apakah Anda yakin ingin keluar?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Keluar',
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#EF4444'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Reset variables
+                    currentUser = null;
+                    userRole = null;
+                    
+                    // Show login screen
+                    document.getElementById('mainApp').classList.add('hidden');
+                    document.getElementById('loginScreen').classList.remove('hidden');
+                    
+                    // Clear login input
+                    document.getElementById('loginInput').value = '';
+                    
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Berhasil Logout',
+                        text: 'Terima kasih telah menggunakan sistem',
+                        confirmButtonColor: '#10B981'
+                    });
+                }
+            });
+        }
+
+        // Utility function to format date
+        function formatDate(dateString) {
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString('id-ID', options);
+        }
+
+        // Utility function to format date and time
+        function formatDateTime(dateTimeString) {
+            const date = new Date(dateTimeString);
+            const dateOptions = { year: 'numeric', month: 'short', day: 'numeric' };
+            const timeOptions = { hour: '2-digit', minute: '2-digit' };
+            
+            const formattedDate = date.toLocaleDateString('id-ID', dateOptions);
+            const formattedTime = date.toLocaleTimeString('id-ID', timeOptions);
+            
+            return `${formattedDate}, ${formattedTime}`;
+        }
+
+        // Initialize app when page loads
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Show login screen by default
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('mainApp').classList.add('hidden');
+            
+            // Initialize app and test database connection
+            await initializeApp();
+            
+            console.log('Kelas Pak Mahfud - Ready to login');
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97b9fed6a334ce19',t:'MTc1NzI4Nzg0Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
